@@ -1,0 +1,10 @@
+import { Router } from 'express';
+import { authMiddleware, requireRoles } from '../../../middleware/authMiddleware.js';
+import { createProcedure, deleteProcedure, getProcedure, listProcedures, updateProcedure } from '../../../controllers/procedureController.js';
+const router = Router();
+router.get('/', listProcedures);
+router.get('/:id', getProcedure);
+router.post('/', authMiddleware, requireRoles('ADMIN', 'STAFF'), createProcedure);
+router.put('/:id', authMiddleware, requireRoles('ADMIN', 'STAFF'), updateProcedure);
+router.delete('/:id', authMiddleware, requireRoles('ADMIN'), deleteProcedure);
+export default router;

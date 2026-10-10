@@ -1,0 +1,11 @@
+import { Router } from 'express';
+import { authMiddleware, requireRoles } from '../../../middleware/authMiddleware.js';
+import { createApplication, downloadApplicationFile, listApplications, trackApplication, updateApplication } from '../../../controllers/applicationController.js';
+import { uploadMiddleware } from '../../../middleware/uploadMiddleware.js';
+const router = Router();
+router.get('/', authMiddleware, requireRoles('ADMIN', 'STAFF'), listApplications);
+router.get('/track/:code', trackApplication);
+router.get('/files/:fileId', authMiddleware, downloadApplicationFile);
+router.post('/', authMiddleware, uploadMiddleware.array('files', 10), createApplication);
+router.put('/:id', authMiddleware, requireRoles('ADMIN', 'STAFF'), updateApplication);
+export default router;

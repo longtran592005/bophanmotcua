@@ -1,0 +1,304 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  STAFF
+  STUDENT
+  FACULTY
+}
+
+enum UserStatus {
+  ACTIVE
+  LOCKED
+  INACTIVE
+}
+
+enum ApplicationPriority {
+  red
+  yellow
+  green
+}
+
+model User {
+  id             String                @id @default(uuid()) @db.Uuid
+  name           String
+  email          String                @unique
+  code           String                @unique
+  passwordHash   String                @map("password_hash")
+  role           UserRole              @default(STUDENT)
+  phone          String?
+  department     String?
+  status         UserStatus            @default(ACTIVE)
+  avatarUrl      String?               @map("avatar_url")
+  createdAt      DateTime              @default(now()) @map("created_at")
+  lastLoginAt    DateTime?             @map("last_login_at")
+  applications   Application[]         @relation("ApplicantApplications")
+  assignments    Application[]         @relation("StaffApplications")
+  notes          ApplicationNote[]
+  processes      Process[]             @relation("ProcessCreators")
+  news           News[]
+  notifications  Notification[]
+  timelineEvents ApplicationTimeline[]
+
+  @@map("users")
+}
+
+model Procedure {
+  id             String                 @id @default(uuid()) @db.Uuid
+  code           String                 @unique
+  name           String
+  department     String
+  audience       String                 @default("Tất cả")
+  processingTime String                 @default("3 ngày") @map("processing_time")
+  fee            Decimal                @default(0) @db.Decimal(14, 2)
+  description    String?
+  details        String?
+  isActive       Boolean                @default(true) @map("is_active")
+  createdAt      DateTime               @default(now()) @map("created_at")
+  updatedAt      DateTime               @updatedAt @map("updated_at")
+  steps          ProcedureStep[]
+  requirements   ProcedureRequirement[]
+  applications   Application[]
+
+  @@map("procedures")
+}
+
+model ProcedureStep {
+  id          String    @id @default(uuid()) @db.Uuid
+  procedureId String    @map("procedure_id") @db.Uuid
+  stepOrder   Int       @map("step_order")
+  name        String
+  description String?
+  department  String?
+  duration    String?
+  formIds     Json      @default("[]") @map("form_ids")
+  procedure   Procedure @relation(fields: [procedureId], references: [id], onDelete: Cascade)
+
+  @@unique([procedureId, stepOrder])
+  @@map("procedure_steps")
+}
+
+model ProcedureRequirement {
+  id              String    @id @default(uuid()) @db.Uuid
+  procedureId     String    @map("procedure_id") @db.Uuid
+  name            String
+  originalCopies  Int       @default(1) @map("original_copies")
+  duplicateCopies Int       @default(0) @map("duplicate_copies")
+  preparationNote String?   @map("preparation_note")
+  formId          String?   @map("form_id") @db.Uuid
+  displayOrder    Int       @default(1) @map("display_order")
+  procedure       Procedure @relation(fields: [procedureId], references: [id], onDelete: Cascade)
+  form            Form?     @relation(fields: [formId], references: [id], onDelete: SetNull)
+
+  @@map("procedure_requirements")
+}
+
+model Form {
+  id           String                 @id @default(uuid()) @db.Uuid
+  code         String                 @unique
+  name         String
+  category     String
+  department   String
+  version      String                 @default("v1.0")
+  fileType     String                 @default("PDF") @map("file_type")
+  fileSize     String?                @map("file_size")
+  fileUrl      String?                @map("file_url")
+  downloads    Int                    @default(0)
+  isActive     Boolean                @default(true) @map("is_active")
+  createdAt    DateTime               @default(now()) @map("created_at")
+  requirements ProcedureRequirement[]
+
+  @@map("forms")
+}
+
+model Process {
+  id         String        @id @default(uuid()) @db.Uuid
+  code       String?       @unique
+  name       String
+  department String?
+  status     String        @default("DRAFT")
+  createdBy  String?       @map("created_by") @db.Uuid
+  createdAt  DateTime      @default(now()) @map("created_at")
+  updatedAt  DateTime      @updatedAt @map("updated_at")
+  creator    User?         @relation("ProcessCreators", fields: [createdBy], references: [id], onDelete: SetNull)
+  steps      ProcessStep[]
+
+  @@map("processes")
+}
+
+model ProcessStep {
+  id           String  @id @default(uuid()) @db.Uuid
+  processId    String  @map("process_id") @db.Uuid
+  stepOrder    Int     @map("step_order")
+  name         String
+  department   String?
+  assigneeRole String? @map("assignee_role")
+  duration     String?
+  config       Json    @default("{}")
+  process      Process @relation(fields: [processId], references: [id], onDelete: Cascade)
+
+  @@unique([processId, stepOrder])
+  @@map("process_steps")
+}
+
+model Application {
+  id              String                @id @default(uuid()) @db.Uuid
+  code            String                @unique
+  applicantId     String                @map("applicant_id") @db.Uuid
+  procedureId     String                @map("procedure_id") @db.Uuid
+  department      String
+  status          String                @default("Tiếp nhận")
+  priority        ApplicationPriority   @default(green)
+  assignedStaffId String?               @map("assigned_staff_id") @db.Uuid
+  submittedAt     DateTime              @default(now()) @map("submitted_at")
+  expectedAt      DateTime?             @map("expected_at")
+  completedAt     DateTime?             @map("completed_at")
+  returnedAt      DateTime?             @map("returned_at")
+  applicant       User                  @relation("ApplicantApplications", fields: [applicantId], references: [id])
+  procedure       Procedure             @relation(fields: [procedureId], references: [id])
+  assignedStaff   User?                 @relation("StaffApplications", fields: [assignedStaffId], references: [id], onDelete: SetNull)
+  files           ApplicationFile[]
+  timeline        ApplicationTimeline[]
+  notes           ApplicationNote[]
+  notifications   Notification[]
+
+  @@index([status])
+  @@index([department])
+  @@map("applications")
+}
+
+model ApplicationFile {
+  id            String      @id @default(uuid()) @db.Uuid
+  applicationId String      @map("application_id") @db.Uuid
+  originalName  String      @map("original_name")
+  storedName    String?     @map("stored_name")
+  mimeType      String?     @map("mime_type")
+  fileSize      BigInt?     @map("file_size")
+  storageUrl    String      @map("storage_url")
+  uploadedAt    DateTime    @default(now()) @map("uploaded_at")
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("application_files")
+}
+
+model ApplicationTimeline {
+  id            String      @id @default(uuid()) @db.Uuid
+  applicationId String      @map("application_id") @db.Uuid
+  status        String
+  staffId       String?     @map("staff_id") @db.Uuid
+  staffName     String?     @map("staff_name")
+  note          String?
+  createdAt     DateTime    @default(now()) @map("created_at")
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  staff         User?       @relation(fields: [staffId], references: [id], onDelete: SetNull)
+
+  @@map("application_timeline")
+}
+
+model ApplicationNote {
+  id            String      @id @default(uuid()) @db.Uuid
+  applicationId String      @map("application_id") @db.Uuid
+  authorId      String?     @map("author_id") @db.Uuid
+  text          String
+  createdAt     DateTime    @default(now()) @map("created_at")
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  author        User?       @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@map("application_notes")
+}
+
+model KnowledgeDocument {
+  id          String           @id @default(uuid()) @db.Uuid
+  code        String           @unique
+  name        String
+  category    String?
+  fileType    String?          @map("file_type")
+  fileSize    String?          @map("file_size")
+  storageUrl  String?          @map("storage_url")
+  chunkCount  Int              @default(0) @map("chunk_count")
+  indexStatus String           @default("PENDING") @map("index_status")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  indexedAt   DateTime?        @map("indexed_at")
+  chunks      KnowledgeChunk[]
+
+  @@map("knowledge_documents")
+}
+
+model KnowledgeChunk {
+  id          String            @id @default(uuid()) @db.Uuid
+  documentId  String            @map("document_id") @db.Uuid
+  chunkIndex  Int               @map("chunk_index")
+  textContent String            @map("text_content")
+  tokenCount  Int?              @map("token_count")
+  pageNumber  Int?              @map("page_number")
+  metadata    Json              @default("{}")
+  embedding   Json?
+  document    KnowledgeDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, chunkIndex])
+  @@map("knowledge_chunks")
+}
+
+model Faq {
+  id           String   @id @default(uuid()) @db.Uuid
+  question     String
+  answer       String
+  category     String   @default("Thủ tục chung")
+  displayOrder Int      @default(1) @map("display_order")
+  views        Int      @default(0)
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("faqs")
+}
+
+model News {
+  id           String    @id @default(uuid()) @db.Uuid
+  title        String
+  category     String    @default("Thông báo")
+  content      String
+  excerpt      String?
+  thumbnailUrl String?   @map("thumbnail_url")
+  authorId     String?   @map("author_id") @db.Uuid
+  authorName   String?   @map("author_name")
+  views        Int       @default(0)
+  status       String    @default("DRAFT")
+  publishedAt  DateTime? @map("published_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  author       User?     @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@map("news")
+}
+
+model SystemSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("system_settings")
+}
+
+model Notification {
+  id            String       @id @default(uuid()) @db.Uuid
+  userId        String?      @map("user_id") @db.Uuid
+  applicationId String?      @map("application_id") @db.Uuid
+  type          String       @default("info")
+  title         String
+  message       String
+  isRead        Boolean      @default(false) @map("is_read")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  user          User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  application   Application? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
