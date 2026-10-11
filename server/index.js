@@ -5,6 +5,9 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import fs from 'node:fs';
+import path from 'node:path';
+import multer from 'multer';
 import { pool, query } from './db.js';
 
 dotenv.config();
@@ -24,20 +27,28 @@ app.use(cors({ origin: (origin, callback) => {
 app.use(helmet());
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 300, standardHeaders: 'draft-7', legacyHeaders: false }));
 app.use(express.json());
+const uploadDirectory = path.join(process.cwd(), 'uploads');
+fs.mkdirSync(uploadDirectory, { recursive: true });
+const upload = multer({
+  dest: uploadDirectory,
+  limits: { fileSize: 20 * 1024 * 1024 }
+});
+app.use('/uploads', express.static(uploadDirectory));
 
 // Auth Middleware
+function requireRole(...roles) {
+  return (req, res, next) => {
+    if (!req.user || !roles.includes(req.user.role)) return res.status(403).json({ error: 'Bạn không có quyền thực hiện thao tác này' });
+    next();
+  };
+}
+
 function authenticate(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Chưa đăng nhập' });
   }
 
-  function requireRole(...roles) {
-    return (req, res, next) => {
-      if (!req.user || !roles.includes(req.user.role)) return res.status(403).json({ error: 'Bạn không có quyền thực hiện thao tác này' });
-      next();
-    };
-  }
   const token = authHeader.split(' ')[1];
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
@@ -376,6 +387,16 @@ app.post('/api/applications', authenticate, async (req, res) => {
   }
 });
 
+app.post('/api/uploads', authenticate, upload.single('file'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Chưa có tệp được tải lên' });
+  res.status(201).json({
+    name: req.file.originalname,
+    size: `${(req.file.size / (1024 * 1024)).toFixed(1)} MB`,
+    mimeType: req.file.mimetype,
+    url: `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
+  });
+});
+
 // Chuyển trạng thái hồ sơ (Kanban & Chi tiết)
 app.put('/api/applications/:code/status', authenticate, requireRole('Admin', 'Cán bộ xử lý'), async (req, res) => {
   try {
@@ -453,6 +474,16 @@ app.get('/api/faqs', async (req, res) => {
 app.get('/api/news', async (req, res) => {
   const { rows } = await query('SELECT * FROM news ORDER BY published_at DESC');
   res.json(rows);
+});
+
+app.get('/api/users', authenticate, requireRole('Admin'), async (req, res) => {
+  try {
+    const { rows } = await query('SELECT id, name, email, code, role, phone, department, status, created_at, last_login FROM users ORDER BY id ASC');
+    res.json(rows);
+  } catch (error) {
+    console.error('Get users error:', error);
+    res.status(500).json({ error: 'Lỗi lấy danh sách người dùng' });
+  }
 });
 
 app.get('/api/settings', authenticate, requireRole('Admin'), async (req, res) => {

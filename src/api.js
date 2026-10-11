@@ -1,4 +1,4 @@
-﻿const API_BASE = 'http://localhost:5000/api';
+﻿const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export async function fetchApi(endpoint, options = {}) {
   try {
@@ -16,7 +16,7 @@ export async function fetchApi(endpoint, options = {}) {
 
     if (!res.ok) {
       const errData = await res.json().catch(() => ({}));
-      throw new Error(errData.error || `Lỗi HTTP: ${res.status}`);
+      throw new Error(errData.message || errData.error || `Lá»—i HTTP: ${res.status}`);
     }
 
     return await res.json();
@@ -39,13 +39,13 @@ export const api = {
   },
   getProcedure: (codeOrId) => fetchApi(`/procedures/${codeOrId}`),
   createProcedure: (data) => fetchApi('/procedures', { method: 'POST', body: JSON.stringify(data) }),
-  updateProcedure: (code, data) => fetchApi(`/procedures/${code}`, { method: 'PUT', body: JSON.stringify(data) }),
-  deleteProcedure: (code) => fetchApi(`/procedures/${code}`, { method: 'DELETE' }),
+  updateProcedure: (id, data) => fetchApi(`/procedures/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteProcedure: (id) => fetchApi(`/procedures/${id}`, { method: 'DELETE' }),
 
   // Forms
   getForms: () => fetchApi('/forms'),
   createForm: (data) => fetchApi('/forms', { method: 'POST', body: JSON.stringify(data) }),
-  deleteForm: (code) => fetchApi(`/forms/${code}`, { method: 'DELETE' }),
+  deleteForm: (id) => fetchApi(`/forms/${id}`, { method: 'DELETE' }),
 
   // Applications
   getApplications: (params = {}) => {
@@ -53,17 +53,27 @@ export const api = {
     return fetchApi(`/applications${query ? `?${query}` : ''}`);
   },
   trackApplication: (code) => fetchApi(`/applications/${code}`),
+  getApplication: (id) => fetchApi(`/applications/${id}`),
   submitApplication: (data) => fetchApi('/applications', { method: 'POST', body: JSON.stringify(data) }),
-  updateApplicationStatus: (code, data) => fetchApi(`/applications/${code}/status`, { method: 'PUT', body: JSON.stringify(data) }),
-  addApplicationNote: (code, text) => fetchApi(`/applications/${code}/notes`, { method: 'POST', body: JSON.stringify({ text }) }),
+  uploadFile: async file => {
+    const token = localStorage.getItem('tbu_token');
+    const body = new FormData();
+    body.append('file', file);
+    const response = await fetch(`${API_BASE}/uploads`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || `Lỗi tải tệp: ${response.status}`);
+    return result;
+  },
+  updateApplicationStatus: (id, data) => fetchApi(`/applications/${id}/status`, { method: 'PUT', body: JSON.stringify(data) }),
+  addApplicationNote: (id, text, isInternal = true) => fetchApi(`/applications/${id}/notes`, { method: 'POST', body: JSON.stringify({ text, isInternal }) }),
 
-  // FAQs, News, Stats, Settings
+  // Statistics
+  getDashboardStats: () => fetchApi('/stats'),
   getFaqs: () => fetchApi('/faqs'),
   getNews: () => fetchApi('/news'),
-  getStats: () => fetchApi('/stats'),
-  getSettings: () => fetchApi('/settings'),
-  updateSettings: (data) => fetchApi('/settings', { method: 'POST', body: JSON.stringify(data) }),
-
-  // AI Chat
-  sendChatMessage: (message) => fetchApi('/ai/chat', { method: 'POST', body: JSON.stringify({ message }) }),
+  getUsers: () => fetchApi('/users'),
 };

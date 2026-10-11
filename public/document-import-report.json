@@ -1,0 +1,621 @@
+﻿{
+    "generatedAt":  "2026-10-11T09:21:44.9020496+07:00",
+    "total":  78,
+    "matched":  24,
+    "unmapped":  54,
+    "procedureCoverage":  [
+                              {
+                                  "procedureCode":  "TT-TCCB-001",
+                                  "count":  3,
+                                  "documents":  [
+                                                    {
+                                                        "code":  "DOC-003",
+                                                        "name":  "1. Đơn xin nghỉ phép năm - Copy",
+                                                        "role":  "FORM",
+                                                        "url":  "/documents/003-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20M%E1%BA%ABu%20%C4%91%C6%A1n%20b%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20%C4%90%C6%A1n%20xin%20ngh%E1%BB%89%2C%20tr%E1%BB%9F%20l%E1%BA%A1i%20c%C3%B4ng%20t%C3%A1c%2C%20thai%20s%E1%BA%A3n-1.%20%C4%90%C6%A1n%20xin%20ngh%E1%BB%89%20ph%C3%A9p%20n%C4%83m%20-%20Copy.doc"
+                                                    },
+                                                    {
+                                                        "code":  "DOC-004",
+                                                        "name":  "1. Đơn xin nghỉ phép năm",
+                                                        "role":  "FORM",
+                                                        "url":  "/documents/004-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20M%E1%BA%ABu%20%C4%91%C6%A1n%20b%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20%C4%90%C6%A1n%20xin%20ngh%E1%BB%89%2C%20tr%E1%BB%9F%20l%E1%BA%A1i%20c%C3%B4ng%20t%C3%A1c%2C%20thai%20s%E1%BA%A3n-1.%20%C4%90%C6%A1n%20xin%20ngh%E1%BB%89%20ph%C3%A9p%20n%C4%83m.doc"
+                                                    },
+                                                    {
+                                                        "code":  "DOC-045",
+                                                        "name":  "4. Quy trình nghỉ phép",
+                                                        "role":  "PROCESS_GUIDE",
+                                                        "url":  "/documents/045-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-3%20Quy%20tr%C3%ACnh%20gi%E1%BA%A3i%20quy%E1%BA%BFt%20th%E1%BB%A7%20t%E1%BB%A5c%201%20c%E1%BB%ADa-4.%20Quy%20tr%C3%ACnh%20ngh%E1%BB%89%20ph%C3%A9p.doc"
+                                                    }
+                                                ]
+                              },
+                              {
+                                  "procedureCode":  "TT-TCCB-002",
+                                  "count":  10,
+                                  "documents":  [
+                                                    {
+                                                        "code":  "DOC-003",
+                                                        "name":  "1. Đơn xin nghỉ phép năm - Copy",
+                                                        "role":  "FORM",
+                                                        "url":  "/documents/003-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20M%E1%BA%ABu%20%C4%91%C6%A1n%20b%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20%C4%90%C6%A1n%20xin%20ngh%E1%BB%89%2C%20tr%E1%BB%9F%20l%E1%BA%A1i%20c%C3%B4ng%20t%C3%A1c%2C%20thai%20s%E1%BA%A3n-1.%20%C4%90%C6%A1n%20xin%20ngh%E1%BB%89%20ph%C3%A9p%20n%C4%83m%20-%20Copy.doc"
+                                                    },
+                                                    {
+                                                        "code":  "DOC-004",
+                                                        "name":  "1. Đơn xin nghỉ phép năm",
+                                                        "role":  "FORM",
+                                                        "url":  "/documents/004-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20M%E1%BA%ABu%20%C4%91%C6%A1n%20b%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20%C4%90%C6%A1n%20xin%20ngh%E1%BB%89%2C%20tr%E1%BB%9F%20l%E1%BA%A1i%20c%C3%B4ng%20t%C3%A1c%2C%20thai%20s%E1%BA%A3n-1.%20%C4%90%C6%A1n%20xin%20ngh%E1%BB%89%20ph%C3%A9p%20n%C4%83m.doc"
+                                                    },
+                                                    {
+                                                        "code":  "DOC-005",
+                                                        "name":  "2. Đơn xin nghỉ ốm, thai sản",
+                                                        "role":  "FORM",
+                                                        "url":  "/documents/005-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20M%E1%BA%ABu%20%C4%91%C6%A1n%20b%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20%C4%90%C6%A1n%20xin%20ngh%E1%BB%89%2C%20tr%E1%BB%9F%20l%E1%BA%A1i%20c%C3%B4ng%20t%C3%A1c%2C%20thai%20s%E1%BA%A3n-2.%20%C4%90%C6%A1n%20xin%20ngh%E1%BB%89%20%E1%BB%91m%2C%20thai%20s%E1%BA%A3n.doc"
+                                                    },
+                                                    {
+                                                        "code":  "DOC-006",
+                                                        "name":  "3. Đơn xin nghỉ dưỡng sức",
+                                                        "role":  "FORM",
+                                                        "url":  "/documents/006-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20M%E1%BA%ABu%20%C4%91%C6%A1n%20b%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20%C4%90%C6%A1n%20xin%20ngh%E1%BB%89%2C%20tr%E1%BB%9F%20l%E1%BA%A1i%20c%C3%B4ng%20t%C3%A1c%2C%20thai%20s%E1%BA%A3n-3.%20%C4%90%C6%A1n%20xin%20ngh%E1%BB%89%20d%C6%B0%E1%BB%A1ng%20s%E1%BB%A9c.doc"
+                                                    },
+                                                    {
+                                                        "code":  "DOC-007",
+                                                        "name":  "4. Đơn xin nghỉ không lương",
+                                                        "role":  "FORM",
+                                                        "url":  "/documents/007-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20M%E1%BA%ABu%20%C4%91%C6%A1n%20b%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20%C4%90%C6%A1n%20xin%20ngh%E1%BB%89%2C%20tr%E1%BB%9F%20l%E1%BA%A1i%20c%C3%B4ng%20t%C3%A1c%2C%20thai%20s%E1%BA%A3n-4.%20%C4%90%C6%A1n%20xin%20ngh%E1%BB%89%20kh%C3%B4ng%20l%C6%B0%C6%A1ng.doc"
+                                                    },
+                                                    {
+                                                        "code":  "DOC-008",
+                                                        "name":  "5. Đơn xin trở lại công tác",
+                                                        "role":  "FORM",
+                                                        "url":  "/documents/008-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20M%E1%BA%ABu%20%C4%91%C6%A1n%20b%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20%C4%90%C6%A1n%20xin%20ngh%E1%BB%89%2C%20tr%E1%BB%9F%20l%E1%BA%A1i%20c%C3%B4ng%20t%C3%A1c%2C%20thai%20s%E1%BA%A3n-5.%20%C4%90%C6%A1n%20xin%20tr%E1%BB%9F%20l%E1%BA%A1i%20c%C3%B4ng%20t%C3%A1c.doc"
+                                                    },
+                                                    {
+                                                        "code":  "DOC-009",
+                                                        "name":  "Đơn xin chấm dứt HĐLĐ",
+                                                        "role":  "FORM",
+                                                        "url":  "/documents/009-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20M%E1%BA%ABu%20%C4%91%C6%A1n%20b%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20%C4%90%C6%A1n%20xin%20ngh%E1%BB%89%2C%20tr%E1%BB%9F%20l%E1%BA%A1i%20c%C3%B4ng%20t%C3%A1c%2C%20thai%20s%E1%BA%A3n-%C4%90%C6%A1n%20xin%20ch%E1%BA%A5m%20d%E1%BB%A9t%20H%C4%90L%C4%90.doc"
+                                                    },
+                                                    {
+                                                        "code":  "DOC-010",
+                                                        "name":  "Đơn xin trở lại công tác",
+                                                        "role":  "FORM",
+                                                        "url":  "/documents/010-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20M%E1%BA%ABu%20%C4%91%C6%A1n%20b%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20%C4%90%C6%A1n%20xin%20ngh%E1%BB%89%2C%20tr%E1%BB%9F%20l%E1%BA%A1i%20c%C3%B4ng%20t%C3%A1c%2C%20thai%20s%E1%BA%A3n-%C4%90%C6%A1n%20xin%20tr%E1%BB%9F%20l%E1%BA%A1i%20c%C3%B4ng%20t%C3%A1c.doc"
+                                                    },
+                                                    {
+                                                        "code":  "DOC-011",
+                                                        "name":  "Đơn xin việc",
+                                                        "role":  "FORM",
+                                                        "url":  "/documents/011-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20M%E1%BA%ABu%20%C4%91%C6%A1n%20b%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20%C4%90%C6%A1n%20xin%20ngh%E1%BB%89%2C%20tr%E1%BB%9F%20l%E1%BA%A1i%20c%C3%B4ng%20t%C3%A1c%2C%20thai%20s%E1%BA%A3n-%C4%90%C6%A1n%20xin%20vi%E1%BB%87c.doc"
+                                                    },
+                                                    {
+                                                        "code":  "DOC-036",
+                                                        "name":  "1.Quy trình nghỉ ốm đau, thai sản, dưỡng sức",
+                                                        "role":  "PROCESS_GUIDE",
+                                                        "url":  "/documents/036-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-3%20Quy%20tr%C3%ACnh%20gi%E1%BA%A3i%20quy%E1%BA%BFt%20th%E1%BB%A7%20t%E1%BB%A5c%201%20c%E1%BB%ADa-1.Quy%20tr%C3%ACnh%20ngh%E1%BB%89%20%E1%BB%91m%20%C4%91au%2C%20thai%20s%E1%BA%A3n%2C%20d%C6%B0%E1%BB%A1ng%20s%E1%BB%A9c.doc"
+                                                    }
+                                                ]
+                              },
+                              {
+                                  "procedureCode":  "TT-TCCB-003",
+                                  "count":  1,
+                                  "documents":  [
+                                                    {
+                                                        "code":  "DOC-047",
+                                                        "name":  "6. Quy trình tuyển dụng hợp đồng lao động",
+                                                        "role":  "PROCESS_GUIDE",
+                                                        "url":  "/documents/047-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-3%20Quy%20tr%C3%ACnh%20gi%E1%BA%A3i%20quy%E1%BA%BFt%20th%E1%BB%A7%20t%E1%BB%A5c%201%20c%E1%BB%ADa-6.%20Quy%20tr%C3%ACnh%20tuy%E1%BB%83n%20d%E1%BB%A5ng%20h%E1%BB%A3p%20%C4%91%E1%BB%93ng%20lao%20%C4%91%E1%BB%99ng.doc"
+                                                    }
+                                                ]
+                              },
+                              {
+                                  "procedureCode":  "TT-TCCB-004",
+                                  "count":  3,
+                                  "documents":  [
+                                                    {
+                                                        "code":  "DOC-029",
+                                                        "name":  "BẢN CAM KẾT",
+                                                        "role":  "FORM",
+                                                        "url":  "/documents/029-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20M%E1%BA%ABu%20%C4%91%C6%A1n%20b%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20Chuy%E1%BB%83n%20c%C3%B4ng%20t%C3%A1c%2C%20bs%20nh%C3%A2n%20s%E1%BB%B1%2C%20cam%20k%E1%BA%BFt-B%E1%BA%A2N%20CAM%20K%E1%BA%BET.doc"
+                                                    },
+                                                    {
+                                                        "code":  "DOC-030",
+                                                        "name":  "Tờ trình bổ sung thêm nhân sự",
+                                                        "role":  "FORM",
+                                                        "url":  "/documents/030-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20M%E1%BA%ABu%20%C4%91%C6%A1n%20b%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20Chuy%E1%BB%83n%20c%C3%B4ng%20t%C3%A1c%2C%20bs%20nh%C3%A2n%20s%E1%BB%B1%2C%20cam%20k%E1%BA%BFt-T%E1%BB%9D%20tr%C3%ACnh%20b%E1%BB%95%20sung%20th%C3%AAm%20nh%C3%A2n%20s%E1%BB%B1.docx"
+                                                    },
+                                                    {
+                                                        "code":  "DOC-031",
+                                                        "name":  "Đơn xin chuyển công tác",
+                                                        "role":  "FORM",
+                                                        "url":  "/documents/031-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20M%E1%BA%ABu%20%C4%91%C6%A1n%20b%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20Chuy%E1%BB%83n%20c%C3%B4ng%20t%C3%A1c%2C%20bs%20nh%C3%A2n%20s%E1%BB%B1%2C%20cam%20k%E1%BA%BFt-%C4%90%C6%A1n%20xin%20chuy%E1%BB%83n%20c%C3%B4ng%20t%C3%A1c.doc"
+                                                    }
+                                                ]
+                              },
+                              {
+                                  "procedureCode":  "TT-KHTC-001",
+                                  "count":  9,
+                                  "documents":  [
+                                                    {
+                                                        "code":  "DOC-007",
+                                                        "name":  "4. Đơn xin nghỉ không lương",
+                                                        "role":  "FORM",
+                                                        "url":  "/documents/007-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20M%E1%BA%ABu%20%C4%91%C6%A1n%20b%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20%C4%90%C6%A1n%20xin%20ngh%E1%BB%89%2C%20tr%E1%BB%9F%20l%E1%BA%A1i%20c%C3%B4ng%20t%C3%A1c%2C%20thai%20s%E1%BA%A3n-4.%20%C4%90%C6%A1n%20xin%20ngh%E1%BB%89%20kh%C3%B4ng%20l%C6%B0%C6%A1ng.doc"
+                                                    },
+                                                    {
+                                                        "code":  "DOC-012",
+                                                        "name":  "Đơn xin chuyển ngạch",
+                                                        "role":  "FORM",
+                                                        "url":  "/documents/012-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20M%E1%BA%ABu%20%C4%91%C6%A1n%20b%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-2.%20Ph%E1%BB%A5%20c%E1%BA%A5p%2C%20chuy%E1%BB%83n%20ng%E1%BA%A1ch%2C%20l%C6%B0%C6%A1ng-%C4%90%C6%A1n%20xin%20chuy%E1%BB%83n%20ng%E1%BA%A1ch.doc"
+                                                    },
+                                                    {
+                                                        "code":  "DOC-013",
+                                                        "name":  "Đơn xin hưởng phụ cấp đứng lớp cho giảng viên",
+                                                        "role":  "FORM",
+                                                        "url":  "/documents/013-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20M%E1%BA%ABu%20%C4%91%C6%A1n%20b%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-2.%20Ph%E1%BB%A5%20c%E1%BA%A5p%2C%20chuy%E1%BB%83n%20ng%E1%BA%A1ch%2C%20l%C6%B0%C6%A1ng-%C4%90%C6%A1n%20xin%20h%C6%B0%E1%BB%9Fng%20ph%E1%BB%A5%20c%E1%BA%A5p%20%C4%91%E1%BB%A9ng%20l%E1%BB%9Bp%20cho%20gi%E1%BA%A3ng%20vi%C3%AAn.docx"
+                                                    },
+                                                    {
+                                                        "code":  "DOC-014",
+                                                        "name":  "Đơn xin nâng bậc lương trước thời hạn",
+                                                        "role":  "FORM",
+                                                        "url":  "/documents/014-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20M%E1%BA%ABu%20%C4%91%C6%A1n%20b%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-2.%20Ph%E1%BB%A5%20c%E1%BA%A5p%2C%20chuy%E1%BB%83n%20ng%E1%BA%A1ch%2C%20l%C6%B0%C6%A1ng-%C4%90%C6%A1n%20xin%20n%C3%A2ng%20b%E1%BA%ADc%20l%C6%B0%C6%A1ng%20tr%C6%B0%E1%BB%9Bc%20th%E1%BB%9Di%20h%E1%BA%A1n.docx"
+                                                    },
+                                                    {
+                                                        "code":  "DOC-015",
+                                                        "name":  "Đơn xin nâng lương cho người lao động",
+                                                        "role":  "FORM",
+                                                        "url":  "/documents/015-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20M%E1%BA%ABu%20%C4%91%C6%A1n%20b%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-2.%20Ph%E1%BB%A5%20c%E1%BA%A5p%2C%20chuy%E1%BB%83n%20ng%E1%BA%A1ch%2C%20l%C6%B0%C6%A1ng-%C4%90%C6%A1n%20xin%20n%C3%A2ng%20l%C6%B0%C6%A1ng%20cho%20ng%C6%B0%E1%BB%9Di%20lao%20%C4%91%E1%BB%99ng.docx"
+                                                    },
+                                                    {
+                                                        "code":  "DOC-016",
+                                                        "name":  "Đơn xét hưởng phụ cấp thâm niên nhà giáo",
+                                                        "role":  "FORM",
+                                                        "url":  "/documents/016-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-1.%20M%E1%BA%ABu%20%C4%91%C6%A1n%20b%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-2.%20Ph%E1%BB%A5%20c%E1%BA%A5p%2C%20chuy%E1%BB%83n%20ng%E1%BA%A1ch%2C%20l%C6%B0%C6%A1ng-%C4%90%C6%A1n%20x%C3%A9t%20h%C6%B0%E1%BB%9Fng%20ph%E1%BB%A5%20c%E1%BA%A5p%20th%C3%A2m%20ni%C3%AAn%20nh%C3%A0%20gi%C3%A1o.docx"
+                                                    },
+                                                    {
+                                                        "code":  "DOC-040",
+                                                        "name":  "13. Quy trình điều chỉnh phụ cấp ưu đãi đối với nhà giáo",
+                                                        "role":  "PROCESS_GUIDE",
+                                                        "url":  "/documents/040-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-3%20Quy%20tr%C3%ACnh%20gi%E1%BA%A3i%20quy%E1%BA%BFt%20th%E1%BB%A7%20t%E1%BB%A5c%201%20c%E1%BB%ADa-13.%20Quy%20tr%C3%ACnh%20%C4%91i%E1%BB%81u%20ch%E1%BB%89nh%20ph%E1%BB%A5%20c%E1%BA%A5p%20%C6%B0u%20%C4%91%C3%A3i%20%C4%91%E1%BB%91i%20v%E1%BB%9Bi%20nh%C3%A0%20gi%C3%A1o.doc"
+                                                    },
+                                                    {
+                                                        "code":  "DOC-043",
+                                                        "name":  "2.Quy trình nâng bậc lương trước thời hạn",
+                                                        "role":  "PROCESS_GUIDE",
+                                                        "url":  "/documents/043-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-3%20Quy%20tr%C3%ACnh%20gi%E1%BA%A3i%20quy%E1%BA%BFt%20th%E1%BB%A7%20t%E1%BB%A5c%201%20c%E1%BB%ADa-2.Quy%20tr%C3%ACnh%20n%C3%A2ng%20b%E1%BA%ADc%20l%C6%B0%C6%A1ng%20tr%C6%B0%E1%BB%9Bc%20th%E1%BB%9Di%20h%E1%BA%A1n.doc"
+                                                    },
+                                                    {
+                                                        "code":  "DOC-046",
+                                                        "name":  "5. Quy trình nghỉ việc không không lương",
+                                                        "role":  "PROCESS_GUIDE",
+                                                        "url":  "/documents/046-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-3%20Quy%20tr%C3%ACnh%20gi%E1%BA%A3i%20quy%E1%BA%BFt%20th%E1%BB%A7%20t%E1%BB%A5c%201%20c%E1%BB%ADa-5.%20Quy%20tr%C3%ACnh%20ngh%E1%BB%89%20vi%E1%BB%87c%20kh%C3%B4ng%20kh%C3%B4ng%20l%C6%B0%C6%A1ng.doc"
+                                                    }
+                                                ]
+                              },
+                              {
+                                  "procedureCode":  "TT-KHTC-002",
+                                  "count":  0,
+                                  "documents":  [
+
+                                                ]
+                              },
+                              {
+                                  "procedureCode":  "TT-KHCN-001",
+                                  "count":  1,
+                                  "documents":  [
+                                                    {
+                                                        "code":  "DOC-051",
+                                                        "name":  "Phòng Khoa học Công nghệ và HTPT",
+                                                        "role":  "PROCEDURE_GUIDE",
+                                                        "url":  "/documents/051-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-5.%20B%E1%BB%99%20ph%E1%BA%ADn%201%20c%E1%BB%ADa-Th%E1%BB%A7%20t%E1%BB%A5c%20h%C3%A0nh%20ch%C3%ADnh%20c%C3%A1c%20ph%C3%B2ng-Ph%C3%B2ng%20Khoa%20h%E1%BB%8Dc%20C%C3%B4ng%20ngh%E1%BB%87%20v%C3%A0%20HTPT.doc"
+                                                    }
+                                                ]
+                              },
+                              {
+                                  "procedureCode":  "TT-VP-001",
+                                  "count":  0,
+                                  "documents":  [
+
+                                                ]
+                              },
+                              {
+                                  "procedureCode":  "TT-ĐT-001",
+                                  "count":  0,
+                                  "documents":  [
+
+                                                ]
+                              },
+                              {
+                                  "procedureCode":  "TT-ĐT-002",
+                                  "count":  0,
+                                  "documents":  [
+
+                                                ]
+                              },
+                              {
+                                  "procedureCode":  "TT-ĐT-003",
+                                  "count":  0,
+                                  "documents":  [
+
+                                                ]
+                              }
+                          ],
+    "unmappedDocuments":  [
+                              {
+                                  "code":  "DOC-001",
+                                  "name":  "modau",
+                                  "sourcePath":  "modau.docx",
+                                  "role":  "REFERENCE",
+                                  "department":  "Bộ phận Một cửa"
+                              },
+                              {
+                                  "code":  "DOC-002",
+                                  "name":  "TC13a_Đơn xin chuyển đơn vị công tác (nội bộ)",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\1. Mẫu đơn bộ phận 1 cửa\\TC13a_Đơn xin chuyển đơn vị công tác (nội bộ).doc",
+                                  "role":  "FORM",
+                                  "department":  "Bộ phận Một cửa"
+                              },
+                              {
+                                  "code":  "DOC-017",
+                                  "name":  "Báo cáo kết quả thử việc",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\1. Mẫu đơn bộ phận 1 cửa\\3.Đơn HĐLĐ\\Báo cáo kết quả thử việc.doc",
+                                  "role":  "FORM",
+                                  "department":  "Bộ phận Một cửa"
+                              },
+                              {
+                                  "code":  "DOC-018",
+                                  "name":  "Đơn xin chấm dứt HĐLĐ",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\1. Mẫu đơn bộ phận 1 cửa\\3.Đơn HĐLĐ\\Đơn xin chấm dứt HĐLĐ.doc",
+                                  "role":  "FORM",
+                                  "department":  "Bộ phận Một cửa"
+                              },
+                              {
+                                  "code":  "DOC-019",
+                                  "name":  "Đơn xin chấm dứt hợp đồng làm việc",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\1. Mẫu đơn bộ phận 1 cửa\\3.Đơn HĐLĐ\\Đơn xin chấm dứt hợp đồng làm việc.doc",
+                                  "role":  "FORM",
+                                  "department":  "Phòng Tổ chức Cán bộ"
+                              },
+                              {
+                                  "code":  "DOC-020",
+                                  "name":  "Đơn xin tạm hoãn thực hiện hợp đồng",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\1. Mẫu đơn bộ phận 1 cửa\\3.Đơn HĐLĐ\\Đơn xin tạm hoãn thực hiện hợp đồng.doc",
+                                  "role":  "FORM",
+                                  "department":  "Phòng Tổ chức Cán bộ"
+                              },
+                              {
+                                  "code":  "DOC-021",
+                                  "name":  "Đơn đề nghị kí tiếp HĐLĐ",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\1. Mẫu đơn bộ phận 1 cửa\\3.Đơn HĐLĐ\\Đơn đề nghị kí tiếp HĐLĐ.doc",
+                                  "role":  "FORM",
+                                  "department":  "Bộ phận Một cửa"
+                              },
+                              {
+                                  "code":  "DOC-022",
+                                  "name":  "Biên bản họp",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\1. Mẫu đơn bộ phận 1 cửa\\3.Đơn HĐLĐ\\Ký tiếp HĐLĐ\\Biên bản họp.doc",
+                                  "role":  "FORM",
+                                  "department":  "Bộ phận Một cửa"
+                              },
+                              {
+                                  "code":  "DOC-023",
+                                  "name":  "Mẫu tự đánh giá kết quả công việc",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\1. Mẫu đơn bộ phận 1 cửa\\3.Đơn HĐLĐ\\Ký tiếp HĐLĐ\\Mẫu tự đánh giá kết quả công việc.doc",
+                                  "role":  "FORM",
+                                  "department":  "Bộ phận Một cửa"
+                              },
+                              {
+                                  "code":  "DOC-024",
+                                  "name":  "Tờ trình đề nghị ký tiếp HĐLĐ",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\1. Mẫu đơn bộ phận 1 cửa\\3.Đơn HĐLĐ\\Ký tiếp HĐLĐ\\Tờ trình đề nghị ký tiếp HĐLĐ.doc",
+                                  "role":  "FORM",
+                                  "department":  "Bộ phận Một cửa"
+                              },
+                              {
+                                  "code":  "DOC-025",
+                                  "name":  "Đơn xin trở lại công tác sau khi đi học tại nc ngoài",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\1. Mẫu đơn bộ phận 1 cửa\\4. Đơn tập huấn,HN,học tập\\Đơn xin trở lại công tác sau khi đi học tại nc ngoài.doc",
+                                  "role":  "FORM",
+                                  "department":  "Bộ phận Một cửa"
+                              },
+                              {
+                                  "code":  "DOC-026",
+                                  "name":  "Đơn xin đi công tác, hội nghị, tập huấn",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\1. Mẫu đơn bộ phận 1 cửa\\4. Đơn tập huấn,HN,học tập\\Đơn xin đi công tác, hội nghị, tập huấn.doc",
+                                  "role":  "FORM",
+                                  "department":  "Bộ phận Một cửa"
+                              },
+                              {
+                                  "code":  "DOC-027",
+                                  "name":  "Đơn xin đi du lịch, thăm thân nước ngoài",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\1. Mẫu đơn bộ phận 1 cửa\\4. Đơn tập huấn,HN,học tập\\Đơn xin đi du lịch, thăm thân nước ngoài.doc",
+                                  "role":  "FORM",
+                                  "department":  "Bộ phận Một cửa"
+                              },
+                              {
+                                  "code":  "DOC-028",
+                                  "name":  "Đơn xin đi học trong nước",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\1. Mẫu đơn bộ phận 1 cửa\\4. Đơn tập huấn,HN,học tập\\Đơn xin đi học trong nước.doc",
+                                  "role":  "FORM",
+                                  "department":  "Bộ phận Một cửa"
+                              },
+                              {
+                                  "code":  "DOC-032",
+                                  "name":  "thu-tuc-phong-to-chuc-can-bo-20250214030045-e (1)",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\1. Mẫu đơn bộ phận 1 cửa\\Đơn tổng hợp\\thu-tuc-phong-to-chuc-can-bo-20250214030045-e (1).doc",
+                                  "role":  "FORM",
+                                  "department":  "Bộ phận Một cửa"
+                              },
+                              {
+                                  "code":  "DOC-033",
+                                  "name":  "Đơn xin xác nhận công tác tại trường ĐH Thái Bình",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\1. Mẫu đơn bộ phận 1 cửa\\Đơn tổng hợp\\Đơn xin xác nhận công tác tại trường ĐH Thái Bình.doc",
+                                  "role":  "FORM",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-034",
+                                  "name":  "Danh mục thủ tục Bộ phận 1 cửa - Copy",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\2. Các thủ tục 01 cửa giải quyết\\Danh mục thủ tục Bộ phận 1 cửa - Copy.xls",
+                                  "role":  "PROCEDURE_GUIDE",
+                                  "department":  "Bộ phận Một cửa"
+                              },
+                              {
+                                  "code":  "DOC-035",
+                                  "name":  "Danh mục thủ tục Bộ phận 1 cửa",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\2. Các thủ tục 01 cửa giải quyết\\Danh mục thủ tục Bộ phận 1 cửa.xls",
+                                  "role":  "PROCEDURE_GUIDE",
+                                  "department":  "Bộ phận Một cửa"
+                              },
+                              {
+                                  "code":  "DOC-037",
+                                  "name":  "10. Quy trình xử lý kỷ luật viên chức",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\3 Quy trình giải quyết thủ tục 1 cửa\\10. Quy trình xử lý kỷ luật viên chức.docx",
+                                  "role":  "PROCESS_GUIDE",
+                                  "department":  "Phòng Tổ chức Cán bộ"
+                              },
+                              {
+                                  "code":  "DOC-038",
+                                  "name":  "11. Quy trình giải quyết nghỉ việc theo nguyện vọng cá nhân",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\3 Quy trình giải quyết thủ tục 1 cửa\\11. Quy trình giải quyết nghỉ việc theo nguyện vọng cá nhân.docx",
+                                  "role":  "PROCESS_GUIDE",
+                                  "department":  "Phòng Tổ chức Cán bộ"
+                              },
+                              {
+                                  "code":  "DOC-039",
+                                  "name":  "12. Quy trình giải quyết chế độ tử tuất - Copy",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\3 Quy trình giải quyết thủ tục 1 cửa\\12. Quy trình giải quyết chế độ tử tuất - Copy.doc",
+                                  "role":  "PROCESS_GUIDE",
+                                  "department":  "Bộ phận Một cửa"
+                              },
+                              {
+                                  "code":  "DOC-041",
+                                  "name":  "14. QT bổ nhiệm TĐV, PTĐV ĐHTB (1)",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\3 Quy trình giải quyết thủ tục 1 cửa\\14. QT bổ nhiệm TĐV, PTĐV ĐHTB (1).doc",
+                                  "role":  "PROCESS_GUIDE",
+                                  "department":  "Bộ phận Một cửa"
+                              },
+                              {
+                                  "code":  "DOC-042",
+                                  "name":  "15. QT bổ nhiệm TĐV, PTĐV ĐHTB (2)",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\3 Quy trình giải quyết thủ tục 1 cửa\\15. QT bổ nhiệm TĐV, PTĐV ĐHTB (2).doc",
+                                  "role":  "PROCESS_GUIDE",
+                                  "department":  "Bộ phận Một cửa"
+                              },
+                              {
+                                  "code":  "DOC-044",
+                                  "name":  "3.Quy trình đào tạo, bồi dưỡng, tập huấn, hội thảo",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\3 Quy trình giải quyết thủ tục 1 cửa\\3.Quy trình đào tạo, bồi dưỡng, tập huấn, hội thảo.doc",
+                                  "role":  "PROCESS_GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-048",
+                                  "name":  "7. Quy trình xét chuyển CDNN",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\3 Quy trình giải quyết thủ tục 1 cửa\\7. Quy trình xét chuyển CDNN.docx",
+                                  "role":  "PROCESS_GUIDE",
+                                  "department":  "Bộ phận Một cửa"
+                              },
+                              {
+                                  "code":  "DOC-049",
+                                  "name":  "8. Quy trình tiếp nhận và tuyển dụng viên chức",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\3 Quy trình giải quyết thủ tục 1 cửa\\8. Quy trình tiếp nhận và tuyển dụng viên chức.docx",
+                                  "role":  "PROCESS_GUIDE",
+                                  "department":  "Phòng Tổ chức Cán bộ"
+                              },
+                              {
+                                  "code":  "DOC-050",
+                                  "name":  "9. Quy trình xét, đề nghị thi đua - khen thưởng",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\3 Quy trình giải quyết thủ tục 1 cửa\\9. Quy trình xét, đề nghị thi đua - khen thưởng.docx",
+                                  "role":  "PROCESS_GUIDE",
+                                  "department":  "Phòng Tổ chức Cán bộ"
+                              },
+                              {
+                                  "code":  "DOC-052",
+                                  "name":  "Phòng Kế hoạch Tài chính",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\Thủ tục hành chính các phòng\\Phòng Kế hoạch Tài chính.doc",
+                                  "role":  "PROCEDURE_GUIDE",
+                                  "department":  "Bộ phận Một cửa"
+                              },
+                              {
+                                  "code":  "DOC-053",
+                                  "name":  "Phòng Tổ chức cán bộ",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\Thủ tục hành chính các phòng\\Phòng Tổ chức cán bộ.doc",
+                                  "role":  "PROCEDURE_GUIDE",
+                                  "department":  "Phòng Tổ chức Cán bộ"
+                              },
+                              {
+                                  "code":  "DOC-054",
+                                  "name":  "Văn phòng",
+                                  "sourcePath":  "5. Bộ phận 1 cửa\\5. Bộ phận 1 cửa\\Thủ tục hành chính các phòng\\Văn phòng.docx",
+                                  "role":  "PROCEDURE_GUIDE",
+                                  "department":  "Văn phòng"
+                              },
+                              {
+                                  "code":  "DOC-055",
+                                  "name":  "1",
+                                  "sourcePath":  "đào tạo\\1.docx",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-056",
+                                  "name":  "10",
+                                  "sourcePath":  "đào tạo\\10.docx",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-057",
+                                  "name":  "11",
+                                  "sourcePath":  "đào tạo\\11.docx",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-058",
+                                  "name":  "12",
+                                  "sourcePath":  "đào tạo\\12.docx",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-059",
+                                  "name":  "13",
+                                  "sourcePath":  "đào tạo\\13.docx",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-060",
+                                  "name":  "14",
+                                  "sourcePath":  "đào tạo\\14.docx",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-061",
+                                  "name":  "15",
+                                  "sourcePath":  "đào tạo\\15.docx",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-062",
+                                  "name":  "16",
+                                  "sourcePath":  "đào tạo\\16.docx",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-063",
+                                  "name":  "17",
+                                  "sourcePath":  "đào tạo\\17.docx",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-064",
+                                  "name":  "18",
+                                  "sourcePath":  "đào tạo\\18.docx",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-065",
+                                  "name":  "19",
+                                  "sourcePath":  "đào tạo\\19.docx",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-066",
+                                  "name":  "2",
+                                  "sourcePath":  "đào tạo\\2.docx",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-067",
+                                  "name":  "20",
+                                  "sourcePath":  "đào tạo\\20.docx",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-068",
+                                  "name":  "22",
+                                  "sourcePath":  "đào tạo\\22.doc",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-069",
+                                  "name":  "23",
+                                  "sourcePath":  "đào tạo\\23.docx",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-070",
+                                  "name":  "24",
+                                  "sourcePath":  "đào tạo\\24.docx",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-071",
+                                  "name":  "25",
+                                  "sourcePath":  "đào tạo\\25.doc",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-072",
+                                  "name":  "3",
+                                  "sourcePath":  "đào tạo\\3.doc",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-073",
+                                  "name":  "4",
+                                  "sourcePath":  "đào tạo\\4.docx",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-074",
+                                  "name":  "5",
+                                  "sourcePath":  "đào tạo\\5.docx",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-075",
+                                  "name":  "6",
+                                  "sourcePath":  "đào tạo\\6.docx",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-076",
+                                  "name":  "7",
+                                  "sourcePath":  "đào tạo\\7.docx",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-077",
+                                  "name":  "8",
+                                  "sourcePath":  "đào tạo\\8.docx",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              },
+                              {
+                                  "code":  "DOC-078",
+                                  "name":  "9",
+                                  "sourcePath":  "đào tạo\\9.docx",
+                                  "role":  "GUIDE",
+                                  "department":  "Phòng Đào tạo"
+                              }
+                          ]
+}

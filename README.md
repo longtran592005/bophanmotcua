@@ -24,7 +24,26 @@ npm run dev
 
 Frontend chạy mặc định tại `http://localhost:5173`.
 
-## Chạy backend mới
+## Chạy toàn bộ web bằng một lệnh
+
+Sau khi PostgreSQL đã chạy và `server/.env` đã có thông tin kết nối thật:
+
+```powershell
+npm run dev:all
+```
+
+Lệnh này khởi động frontend tại `http://localhost:5173` và backend PostgreSQL
+tại `http://localhost:5000`. Backend đang dùng là `server/`, vì schema hiện có
+trên database local là schema legacy tương ứng với backend này.
+
+## Tài liệu nghiệp vụ đã tích hợp
+
+Các tài liệu từ thư mục nguồn đã được đưa vào `public/documents/` và lập danh
+mục tại `public/documents-manifest.json`. Trang `/forms` tự động hiển thị các
+tài liệu này và nút tải xuống mở đúng file gốc. Bản DOCX/PDF cũng được sao chép
+vào `rag-service/documents/` để sẵn sàng lập chỉ mục cho trợ lý AI.
+
+## Backend mới (tuỳ chọn)
 
 ```powershell
 cd backend

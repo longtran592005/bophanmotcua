@@ -16,6 +16,8 @@ import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieCh
 import { motion, AnimatePresence } from 'framer-motion';
 import QRCode from 'qrcode';
 import './styles.css';
+import { documentManifest } from './documentManifest';
+import { api } from './api';
 
 const procedures = [
   { id:'xac-nhan-sinh-vien', title: 'Đăng ký xác nhận sinh viên', code:'TT-DT-001', dept: 'Phòng Đào tạo', time: '1-2 ngày', audience: 'Sinh viên', fee:'Miễn phí', intake:'Trực tuyến 100%', icon: GraduationCap },
@@ -25,6 +27,10 @@ const procedures = [
   { id:'su-dung-phong-hoc', title: 'Đăng ký sử dụng phòng học', code:'TT-VP-005', dept: 'Văn phòng', time: '1-3 ngày', audience: 'Tất cả', fee:'Miễn phí', intake:'Trực tuyến 100%', icon: Building2 },
   { id:'cap-lai-the-sinh-vien', title: 'Xin cấp lại thẻ sinh viên', code:'TT-DT-006', dept: 'Phòng Đào tạo', time: '2-3 ngày', audience: 'Sinh viên', fee:'50.000đ', intake:'Trực tuyến 100%', icon: ShieldCheck }
 ];
+const normalizeProcedureCode = (code = '') => code.replace(/Đ/g, 'D').toUpperCase();
+const documentsForProcedure = (procedure) => documentManifest
+  .filter(document => document.procedureCodes?.some(code => normalizeProcedureCode(code) === normalizeProcedureCode(procedure.code)))
+  .sort((a, b) => (a.role === 'FORM' ? -1 : 1) - (b.role === 'FORM' ? -1 : 1));
 const procedureDetails = (procedure) => ({
   ...procedure,
   steps: [
@@ -42,6 +48,7 @@ const procedureDetails = (procedure) => ({
     ['Đơn đề nghị thực hiện thủ tục', 'DOCX', '186 KB'],
     ['Phiếu tiếp nhận và hẹn trả kết quả', 'PDF', '420 KB']
   ],
+  attachedDocuments: documentsForProcedure(procedure),
   legal: ['Quy chế tổ chức và hoạt động của Trường Đại học Thái Bình năm 2026', 'Quy định tiếp nhận và giải quyết thủ tục hành chính tại Bộ phận Một cửa', 'Quyết định số 128/QĐ-ĐHTB ngày 05/01/2026 về cung cấp dịch vụ công trực tuyến'],
   faqs: [['Thời gian xử lý có tính ngày nghỉ không?', 'Thời hạn được tính theo ngày làm việc, không bao gồm thứ Bảy, Chủ nhật và ngày lễ.'], ['Tôi có thể bổ sung hồ sơ sau khi đã nộp không?', 'Có. Hệ thống sẽ gửi yêu cầu bổ sung và hướng dẫn chi tiết nếu hồ sơ chưa đầy đủ.'], ['Làm sao để theo dõi kết quả?', 'Bạn dùng mã hồ sơ trong email xác nhận để tra cứu trên mục Tra cứu hồ sơ.']]
 });
@@ -53,34 +60,147 @@ const news = [
 ];
 
 const demoUsers = {
-  student: { id: 'sv-2100123', name: 'Nguyễn Lan Anh', email: 'lananh@tbu.edu.vn', code: '21D100123', role: 'student', avatar: 'LA', phone: '0988 123 456', department: 'Khoa Kinh tế' },
-  staff: { id: 'cb-001', name: 'Trần Thu Hà', email: 'thuha@tbu.edu.vn', code: 'CBGV001', role: 'staff', avatar: 'TH', phone: '0912 345 678', department: 'Bộ phận Một cửa' },
-  admin: { id: 'ad-001', name: 'Quản trị viên', email: 'admin@tbu.edu.vn', code: 'ADMIN001', role: 'admin', avatar: 'AD', phone: '0901 234 567', department: 'Phòng Công nghệ thông tin' }
+  student: { id: 'sv-2100123', name: 'Nguyễn Lan Anh', email: 'lananh@tbu.edu.vn', code: '21D100123', role: 'student', avatar: 'LA', phone: '0988 123 456', department: 'Khoa Kinh tế', password: '123456' },
+  staff: { id: 'cb-001', name: 'Trần Thu Hà', email: 'thuha@tbu.edu.vn', code: 'CBGV001', role: 'staff', avatar: 'TH', phone: '0912 345 678', department: 'Bộ phận Một cửa', password: '123456' },
+  admin: { id: 'ad-001', name: 'Quản trị viên', email: 'admin@tbu.edu.vn', code: 'ADMIN001', role: 'admin', avatar: 'AD', phone: '0901 234 567', department: 'Phòng Công nghệ thông tin', password: '123456' }
 };
+
+const initialUsers = [
+  { id: 'sv-2100123', name: 'Nguyễn Lan Anh', email: 'lananh@tbu.edu.vn', code: '21D100123', role: 'student', avatar: 'LA', phone: '0988 123 456', department: 'Khoa Kinh tế', status: 'Active', password: '123456', created: '08/09/2024', last: '08/10/2026' },
+  { id: 'cb-001', name: 'Trần Thu Hà', email: 'thuha@tbu.edu.vn', code: 'CBGV001', role: 'staff', avatar: 'TH', phone: '0912 345 678', department: 'Bộ phận Một cửa', status: 'Active', password: '123456', created: '02/01/2022', last: '10/10/2026' },
+  { id: 'ad-001', name: 'Quản trị viên', email: 'admin@tbu.edu.vn', code: 'ADMIN001', role: 'admin', avatar: 'AD', phone: '0901 234 567', department: 'Phòng Công nghệ thông tin', status: 'Active', password: '123456', created: '04/01/2021', last: '10/10/2026' },
+  { id: 'cb-002', name: 'Trần Minh Đức', email: 'minhduc@tbu.edu.vn', code: 'CBGV-0182', role: 'staff', avatar: 'MD', phone: '0977 234 567', department: 'Phòng KHTC', status: 'Active', password: '123456', created: '11/03/2023', last: '09/10/2026' },
+];
+
+const parseDateVN = (str) => {
+  if (!str) return new Date();
+  if (typeof str === 'string' && str.includes('/')) {
+    const parts = str.split('/');
+    if (parts.length === 3) {
+      const [d, m, y] = parts;
+      return new Date(`${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`);
+    }
+  }
+  const d = new Date(str);
+  return isNaN(d.getTime()) ? new Date() : d;
+};
+
+const downloadSampleFile = (fileName = 'bieu-mau.doc', title = 'Biểu mẫu hành chính') => {
+  const sourceName = fileName.replace(/\.(docx?|xlsx?|pdf)$/i, '');
+  const sourceDocument = documentManifest.find(item => item.name === sourceName);
+  if (sourceDocument?.url) {
+    window.open(sourceDocument.url, '_blank', 'noopener,noreferrer');
+    return;
+  }
+  const cleanName = fileName.endsWith('.doc') || fileName.endsWith('.docx') || fileName.endsWith('.pdf') ? fileName : `${fileName}.doc`;
+  const content = `TRƯỜNG ĐẠI HỌC THÁI BÌNH\nBỘ PHẬN TIẾP NHẬN VÀ TRẢ KẾT QUẢ (MỘT CỬA)\n\nCỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM\nĐộc lập - Tự do - Hạnh phúc\n--------------------------------\n\n${(title || cleanName).toUpperCase()}\n(Mã văn bản: ${cleanName})\nNgày ban hành: ${new Date().toLocaleDateString('vi-VN')}\n\nKính gửi: Bộ phận Tiếp nhận và Trả kết quả (Một cửa)\n\n1. THÔNG TIN NGƯỜI ĐỀ NGHỊ:\n- Họ và tên: ........................................................\n- Mã định danh (MSV / CBGV): ........................................\n- Khoa / Phòng ban: .................................................\n- Số điện thoại: .................... Email: .........................\n\n2. NỘI DUNG YÊU CẦU / ĐỀ NGHỊ:\n....................................................................\n....................................................................\n\n3. HỒ SƠ ĐÍNH KÈM:\n- 01 bản chính theo quy định\n- Bản sao các giấy tờ liên quan\n\nTôi xin cam đoan các thông tin khai trên là đúng sự thật.\n\nThái Bình, ngày ..... tháng ..... năm 2026\nNGƯỜI LÀM ĐƠN\n(Ký và ghi rõ họ tên)`;
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = cleanName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+};
+
+const normalizeDocumentName = (value = '') => value
+  .toLowerCase()
+  .replace(/\.(docx?|xlsx?|pdf)$/i, '')
+  .replace(/\s*-\s*copy\b/g, '')
+  .replace(/[^a-z0-9\u00c0-\u024f]+/gi, '');
+const findDocument = (document) => {
+  if (!document) return null;
+  if (document.code) {
+    const byCode = documentManifest.find(item => item.code === document.code);
+    if (byCode) return byCode;
+  }
+  const target = normalizeDocumentName(document.name || document);
+  return documentManifest.find(item => normalizeDocumentName(item.name) === target)
+    || documentManifest.find(item => normalizeDocumentName(item.name).includes(target) || target.includes(normalizeDocumentName(item.name)));
+};
+const downloadDocument = (document) => {
+  const sourceDocument = findDocument(document);
+  if (sourceDocument?.url) {
+    const link = window.document.createElement('a');
+    link.href = sourceDocument.url;
+    link.download = sourceDocument.originalFileName || sourceDocument.storedName || sourceDocument.name;
+    link.rel = 'noopener';
+    window.document.body.appendChild(link);
+    link.click();
+    link.remove();
+    return;
+  }
+  downloadSampleFile(document?.name, document?.name);
+};
+
 const roleLabel = (role) => ({ student: 'Sinh viên', staff: 'Cán bộ xử lý', admin: 'Quản trị viên' }[role] || 'Khách');
+const normalizeRole = role => {
+  const value = String(role || '').toLowerCase();
+  if (value === 'admin' || value === 'quản trị viên') return 'admin';
+  if (value === 'staff' || value === 'cán bộ xử lý' || value === 'cán bộ') return 'staff';
+  return 'student';
+};
+const isAdmin = user => normalizeRole(user?.role) === 'admin';
+const isStaff = user => ['admin', 'staff'].includes(normalizeRole(user?.role));
 const initials = (name = '') => name.split(' ').filter(Boolean).slice(-2).map(item => item[0]).join('').toUpperCase();
 const DataStoreContext = createContext(null);
-const publicProcedure = item => ({ ...item, id: item.id || item.code?.toLowerCase().replace(/[^a-z0-9]+/g, '-'), title: item.title || item.name, name: item.name || item.title, code: item.code || `TT-${String(item.id || '').slice(0, 5).toUpperCase()}`, dept: item.dept || item.department, time: item.time || '3-5 ngày', audience: item.audience || 'Tất cả', fee: item.fee || 'Miễn phí', intake: item.intake || 'Trực tuyến 100%', icon: item.icon || FileText });
+const publicProcedure = item => ({
+  ...item,
+  id: item.id || item.code?.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+  title: item.title || item.name,
+  name: item.name || item.title,
+  code: item.code || `TT-${String(item.id || '').slice(0, 5).toUpperCase()}`,
+  dept: item.dept || item.department,
+  time: item.time || '3-5 ngày',
+  audience: item.audience || 'Tất cả',
+  fee: item.fee || 'Miễn phí',
+  intake: item.intake || 'Trực tuyến 100%',
+  icon: typeof item.icon === 'function' ? item.icon : FileText
+});
 function DataStoreProvider({ children }) {
-  const [storeProcedures, setStoreProcedures] = useState(() => {
-    try { const saved = JSON.parse(localStorage.getItem('tbu-procedures')); return saved?.length ? saved : procedureManagementSeed.map(publicProcedure); } catch { return procedureManagementSeed.map(publicProcedure); }
-  });
-  const [storeForms, setStoreForms] = useState(() => { try { const saved = JSON.parse(localStorage.getItem('tbu-forms')); return saved?.length ? saved : formSeed; } catch { return formSeed; } });
-  const [storeApplications, setStoreApplications] = useState(() => { try { const saved = JSON.parse(localStorage.getItem('tbu-applications')); return saved?.length ? saved : applicationSeed; } catch { return applicationSeed; } });
-  const [knowledgeBase, setKnowledgeBase] = useState(() => { try { const saved = JSON.parse(localStorage.getItem('tbu-knowledge-base')); return saved?.length ? saved : knowledgeSeed; } catch { return knowledgeSeed; } });
+  useEffect(() => {
+    ['tbu-procedures', 'tbu-forms', 'tbu-applications', 'tbu-knowledge-base', 'tbu-users'].forEach(key => localStorage.removeItem(key));
+  }, []);
+  const [storeProcedures, setStoreProcedures] = useState([]);
+  const [storeForms, setStoreForms] = useState([]);
+  const [storeApplications, setStoreApplications] = useState([]);
+  const [knowledgeBase, setKnowledgeBase] = useState([]);
+  const [storeUsers, setStoreUsers] = useState([]);
   const [notifications, setNotifications] = useState(() => { try { return JSON.parse(localStorage.getItem('tbu-notifications')) || []; } catch { return []; } });
   const [institution, setInstitution] = useState(() => { try { return JSON.parse(localStorage.getItem('tbu-institution')) || { unitName: 'Trường Đại học Thái Bình', departmentName: 'Bộ phận Tiếp nhận và Trả kết quả (Một cửa)', address: 'Phố Lê Thánh Tông, Phường Trần Hưng Đạo, TP. Thái Bình', hotline: '(0227) 3831 499 - 0988 xxx xxx', email: 'motcua@tbu.edu.vn', workingHours: 'Thứ 2 - Thứ 6 (Sáng 7h30-11h30, Chiều 13h30-17h00)' }; } catch { return { unitName: 'Trường Đại học Thái Bình', departmentName: 'Bộ phận Tiếp nhận và Trả kết quả (Một cửa)', address: 'Phố Lê Thánh Tông, Phường Trần Hưng Đạo, TP. Thái Bình', hotline: '(0227) 3831 499 - 0988 xxx xxx', email: 'motcua@tbu.edu.vn', workingHours: 'Thứ 2 - Thứ 6 (Sáng 7h30-11h30, Chiều 13h30-17h00)' }; } });
-  useEffect(() => localStorage.setItem('tbu-procedures', JSON.stringify(storeProcedures)), [storeProcedures]);
-  useEffect(() => localStorage.setItem('tbu-forms', JSON.stringify(storeForms)), [storeForms]);
-  useEffect(() => localStorage.setItem('tbu-applications', JSON.stringify(storeApplications)), [storeApplications]);
-  useEffect(() => localStorage.setItem('tbu-knowledge-base', JSON.stringify(knowledgeBase)), [knowledgeBase]);
+  useEffect(() => {
+    Promise.all([api.getProcedures(), api.getForms(), api.getFaqs(), api.getNews()])
+      .then(([procedures, forms, faqs, newsItems]) => {
+        setStoreProcedures(procedures.map(publicProcedure));
+        setStoreForms(forms);
+        setKnowledgeBase(faqs.map(item => ({ ...item, name: item.question, category: 'FAQ', type: 'FAQ', status: 'Đã index' })));
+      })
+      .catch(error => console.error('Không thể tải dữ liệu từ PostgreSQL:', error));
+  }, []);
+  useEffect(() => {
+    if (localStorage.getItem('tbu_token')) {
+      api.getApplications().then(rows => setStoreApplications(rows.map(applicationFromApi)))
+        .catch(error => console.warn('Không thể đồng bộ hồ sơ từ máy chủ:', error.message));
+    }
+  }, []);
   useEffect(() => localStorage.setItem('tbu-notifications', JSON.stringify(notifications)), [notifications]);
   useEffect(() => localStorage.setItem('tbu-institution', JSON.stringify(institution)), [institution]);
   const addNotification = notification => setNotifications(items => [{ id: Date.now(), createdAt: new Date().toISOString(), ...notification }, ...items].slice(0, 30));
   const markNotificationsRead = () => setNotifications(items => items.map(item => ({ ...item, read: true })));
-  const resetData = () => { setStoreProcedures(procedureManagementSeed.map(publicProcedure)); setStoreForms(formSeed); setStoreApplications(applicationSeed); setKnowledgeBase(knowledgeSeed); setNotifications([]); };
-  return <DataStoreContext.Provider value={{ procedures: storeProcedures, forms: storeForms, applications: storeApplications, knowledgeBase, notifications, institution, setInstitution, setProcedures: setStoreProcedures, setForms: setStoreForms, setApplications: setStoreApplications, setKnowledgeBase, addNotification, markNotificationsRead, resetData }}>{children}</DataStoreContext.Provider>;
+  const resetData = () => { setStoreProcedures([]); setStoreForms([]); setStoreApplications([]); setKnowledgeBase([]); setStoreUsers([]); setNotifications([]); };
+  return <DataStoreContext.Provider value={{ procedures: storeProcedures, forms: storeForms, applications: storeApplications, knowledgeBase, users: storeUsers, notifications, institution, setInstitution, setProcedures: setStoreProcedures, setForms: setStoreForms, setApplications: setStoreApplications, setKnowledgeBase, setUsers: setStoreUsers, addNotification, markNotificationsRead, resetData }}>{children}</DataStoreContext.Provider>;
 }
+const applicationFromApi = item => ({
+  ...item,
+  applicant: item.applicant || item.applicant_name,
+  procedure: item.procedure || item.procedure_name,
+  date: item.date || item.submitted_date,
+  staff: item.staff || item.assigned_staff || 'Mới',
+  files: Array.isArray(item.files) ? item.files : [],
+  codeSV: item.codeSV || item.applicant_code
+});
 const useDataStore = () => useContext(DataStoreContext);
 const downloadCsv = (filename, rows) => {
   const escape = value => `"${String(value ?? '').replace(/"/g, '""')}"`;
@@ -180,23 +300,32 @@ function MarkdownText({ text = '', navigate }) {
 }
 
 function ChatMessage({ message, index, onContext, onSend, navigate }) {
+  const [feedback, setFeedback] = useState(null);
   return <div className={message.from === 'user' ? 'message user' : 'message'} onContextMenu={onContext} style={{animationDelay:`${Math.min(index * 50, 250)}ms`}}>
     <div className="message-bubble"><MarkdownText text={message.text} navigate={navigate} /></div>
     {message.type === 'guide' && <div className="guide-card">{message.steps.map((step,i)=><details key={step[0]} open={i===0}><summary><span>{i+1}</span><b>{step[0]}</b></summary><p>{step[1]}</p></details>)}{message.form && <FormChatCard name={message.form} size="186 KB" format="DOC" />}</div>}
     {message.type === 'procedure' && <div className="procedure-chat-card"><div className="chat-card-label">THỦ TỤC ĐỀ XUẤT</div><b>{message.procedure}</b><span className="chat-dept">{message.dept}</span><small>Thời gian xử lý: {message.time}</small><p>Hướng dẫn chi tiết các bước thực hiện và hồ sơ cần chuẩn bị.</p><div><button onClick={()=>onSend('Xem chi tiết thủ tục')}>Xem chi tiết</button><button onClick={()=>onSend('Nộp hồ sơ online')}>Nộp hồ sơ</button></div></div>}
     {message.type === 'form' && <FormChatCard name={message.form} size={message.size} format={message.format}/>}
     {message.type === 'status' && <div className="status-chat-card">{['Đã tiếp nhận','Đang xử lý','Hoàn thành','Trả kết quả'].map((x,i)=><div className={i<2?'done':''} key={x}><i>{i<2?<Check size={10}/>:i+1}</i><span>{x}<small>{i<2?'08/10/2026 · 10:05':'Đang chờ xử lý'}</small></span></div>)}</div>}
-    {message.from === 'bot' && <span className="feedback">♧ Hữu ích &nbsp; • &nbsp; Không</span>}
+    {message.from === 'bot' && (
+      <div className="feedback">
+        {feedback ? <small style={{color:'#16a34a',fontWeight:600}}>✓ Cảm ơn bạn đã phản hồi</small> : <>
+          <button type="button" style={{background:'none',border:'none',cursor:'pointer',fontSize:'inherit',color:'inherit'}} onClick={() => setFeedback('up')}>👍 Hữu ích</button>
+          <span> • </span>
+          <button type="button" style={{background:'none',border:'none',cursor:'pointer',fontSize:'inherit',color:'inherit'}} onClick={() => setFeedback('down')}>👎 Không</button>
+        </>}
+      </div>
+    )}
   </div>;
 }
-function FormChatCard({name,size='186 KB',format='DOC'}) { return <div className="form-chat-card"><span className="form-chat-icon"><FileText size={18}/></span><span><b>{name}</b><small>{format} · {size}</small></span><button>Tải về <Download size={14}/></button></div>; }
+function FormChatCard({name,size='186 KB',format='DOC'}) { return <div className="form-chat-card"><span className="form-chat-icon"><FileText size={18}/></span><span><b>{name}</b><small>{format} · {size}</small></span><button onClick={() => downloadSampleFile(name, name)}>Tải về <Download size={14}/></button></div>; }
 function ChatEmpty({onSelect}) { return <div className="chat-empty"><span className="empty-bot"><Bot size={32}/></span><h3>Tôi có thể giúp gì cho bạn?</h3><p>Tra cứu thủ tục, hướng dẫn nộp hồ sơ và tải biểu mẫu.</p><div>{['Thủ tục xin nghỉ phép cần gì?','Làm sao để nộp hồ sơ online?','Quy trình nâng lương trước hạn?','Tải đơn xin chuyển công tác'].map(x=><button key={x} onClick={()=>onSelect(x)}>{x}</button>)}</div></div>; }
 
 function App() {
   const dataStore = useDataStore();
   const { institution } = dataStore;
-  const pageFromPath = () => {
-    const path = window.location.pathname.replace(/^\/+/, '');
+  const pageFromPath = (pathname = window.location.pathname) => {
+    const path = pathname.replace(/^\/+/, '');
     if (path === 'admin/procedures') return 'admin-procedures';
     if (path === 'admin/forms') return 'admin-forms';
     if (path === 'admin/processes') return 'admin-processes';
@@ -255,10 +384,19 @@ function App() {
   }, []);
   useEffect(() => {
     const protectedPath = window.location.pathname === '/admin' || window.location.pathname.startsWith('/admin/');
-    if (protectedPath && !['admin', 'staff'].includes(currentUser?.role)) {
+    const adminOnlyPath = ['/admin/users', '/admin/knowledge-base', '/admin/faq', '/admin/news', '/admin/reports', '/admin/settings']
+      .includes(window.location.pathname);
+    if (protectedPath && !isStaff(currentUser)) {
       setAuthNotice('Bạn cần đăng nhập bằng tài khoản quản trị');
       setPage('login');
       window.history.replaceState({}, '', '/login');
+    } else if (adminOnlyPath && !isAdmin(currentUser)) {
+      setAuthNotice('Chức năng này chỉ dành cho Quản trị viên.');
+      setPage('admin');
+      window.history.replaceState({}, '', '/admin');
+    } else if (window.location.pathname === '/admin' && !isAdmin(currentUser)) {
+      setPage('admin-applications');
+      window.history.replaceState({}, '', '/admin/applications');
     }
   }, [currentUser]);
   useEffect(() => {
@@ -266,25 +404,26 @@ function App() {
     localStorage.setItem('tbu-theme', darkMode ? 'dark' : 'light');
   }, [darkMode]);
   const navigate = (next) => {
-    const routeName = next.split('?')[0];
-    setPage(routeName);
     window.history.pushState({}, '', next === 'home' ? '/' : `/${next}`);
+    setPage(pageFromPath());
     setMobileOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   const login = (user, message = '') => {
-    setCurrentUser(user);
-    localStorage.setItem('currentUser', JSON.stringify(user));
+    const normalizedUser = { ...user, role: normalizeRole(user.role) };
+    setCurrentUser(normalizedUser);
+    localStorage.setItem('currentUser', JSON.stringify(normalizedUser));
     setAuthNotice(message);
     if (message) {
       setToast({ type: 'success', text: message });
       window.setTimeout(() => setToast(null), 3000);
     }
-    navigate(user.role === 'admin' || user.role === 'staff' ? 'admin' : 'home');
+    navigate(isStaff(normalizedUser) ? 'admin' : 'home');
   };
   const logout = () => {
     setCurrentUser(null);
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('tbu_token');
     setProfileOpen(false);
     setToast({ type: 'success', text: '✅ Bạn đã đăng xuất thành công' });
     navigate('home');
@@ -396,28 +535,28 @@ function App() {
           <nav className={mobileOpen ? 'nav open' : 'nav'}>
             <button className={page === 'home' ? 'active' : ''} onClick={() => navigate('home')}>Trang chủ</button>
             <button className={page === 'procedures' ? 'active' : ''} onClick={() => navigate('procedures')}>Thủ tục hành chính</button>
-            <button onClick={() => navigate('forms')}>Biểu mẫu</button>
+            <button className={page === 'forms' ? 'active' : ''} onClick={() => navigate('forms')}>Biểu mẫu</button>
             <button className={page === 'apply' ? 'active' : ''} onClick={() => navigate('apply')}>Nộp hồ sơ</button>
             <button className={page === 'track' ? 'active' : ''} onClick={() => navigate('track')}>Tra cứu</button>
-            <button onClick={() => navigate('news')}>Tin tức</button>
+            <button className={page === 'news' ? 'active' : ''} onClick={() => navigate('news')}>Tin tức</button>
           </nav>
           <div className="header-actions">
-            <button className="icon-button" aria-label="Tìm kiếm"><Search size={19} /></button>
+            <button className="icon-button" aria-label="Tìm kiếm thủ tục" onClick={() => navigate('procedures')}><Search size={19} /></button>
             <button className="icon-button" aria-label={darkMode ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối'} onClick={() => setDarkMode(value => !value)}>{darkMode ? '☀' : '◐'}</button>
             <NotificationButton audience={currentUser?.email || currentUser?.role || 'guest'} />
-            {currentUser ? <div className="profile-wrap"><button className="profile-button" onClick={() => setProfileOpen(value => !value)}><span className="avatar">{currentUser.avatar || initials(currentUser.name)}</span><span className="profile-name">{currentUser.name}</span><ChevronDown size={15} /></button>{profileOpen && <div className="profile-menu"><div className="profile-menu-head"><b>{currentUser.name}</b><small>{roleLabel(currentUser.role)}</small></div><button onClick={() => { setProfileOpen(false); navigate('profile'); }}><UserCircle size={16}/> Hồ sơ cá nhân</button><button onClick={() => { setProfileOpen(false); navigate('track'); }}><FolderOpen size={16}/> Hồ sơ của tôi</button>{['admin','staff'].includes(currentUser.role) && <button onClick={() => { setProfileOpen(false); navigate('admin'); }}><LayoutDashboard size={16}/> Trang quản trị Admin</button>}<button className="profile-logout" onClick={logout}><LogOut size={16}/> Đăng xuất</button></div>}</div> : <><button className="auth-link" onClick={() => navigate('login')}>Đăng nhập</button><button className="auth-register" onClick={() => navigate('register')}>Đăng ký</button></>}
+            {currentUser ? <div className="profile-wrap"><button className="profile-button" onClick={() => setProfileOpen(value => !value)}><span className="avatar">{currentUser.avatar || initials(currentUser.name)}</span><span className="profile-name">{currentUser.name}</span><ChevronDown size={15} /></button>{profileOpen && <div className="profile-menu"><div className="profile-menu-head"><b>{currentUser.name}</b><small>{roleLabel(currentUser.role)}</small></div><button onClick={() => { setProfileOpen(false); navigate('profile'); }}><UserCircle size={16}/> Hồ sơ cá nhân</button><button onClick={() => { setProfileOpen(false); navigate('track'); }}><FolderOpen size={16}/> Hồ sơ của tôi</button>{isStaff(currentUser) && <button onClick={() => { setProfileOpen(false); navigate('admin'); }}><LayoutDashboard size={16}/> {isAdmin(currentUser) ? 'Trang quản trị hệ thống' : 'Nghiệp vụ Một cửa'}</button>}<button className="profile-logout" onClick={logout}><LogOut size={16}/> Đăng xuất</button></div>}</div> : <><button className="auth-link" onClick={() => navigate('login')}>Đăng nhập</button><button className="auth-register" onClick={() => navigate('register')}>Đăng ký</button></>}
           </div>
         </div>
       </header>
 
       <motion.main initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-        {page === 'home' && <Home navigate={navigate} />}
+        {page === 'home' && <Home navigate={navigate} onOpenChat={() => setChatOpen(true)} />}
         {page === 'procedures' && <Procedures navigate={navigate} />}
         {page === 'forms' && <Forms />}
         {page === 'apply' && <Apply navigate={navigate} currentUser={currentUser} />}
         {page === 'track' && <Track currentUser={currentUser} />}
         {page === 'news' && <News />}
-        {page === 'profile' && <Profile />}
+        {page === 'profile' && <Profile currentUser={currentUser} navigate={navigate} />}
         {page.startsWith('procedure-detail:') && <ProcedureDetail procedure={procedureDetails(dataStore.procedures.find(item => item.id === page.split(':')[1]) || dataStore.procedures[0] || procedures[0])} navigate={navigate} onAsk={askProcedure} />}
         {page === 'not-found' && <NotFound navigate={navigate} />}
       </motion.main>
@@ -454,46 +593,83 @@ function AuthShell({ children, title, subtitle }) {
 }
 
 function Login({ onLogin, navigate, notice }) {
+  const { users } = useDataStore();
   const [identity, setIdentity] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(true);
   const [error, setError] = useState(notice || '');
-  const submit = (event) => {
+  const submit = async (event) => {
     event.preventDefault();
     if (!identity.trim() || !password) return setError('Vui lòng nhập đầy đủ thông tin đăng nhập.');
     if (identity.includes('@') && !/^[^@\s]+@tbu\.edu\.vn$/i.test(identity)) return setError('Vui lòng sử dụng email trường có đuôi @tbu.edu.vn.');
-    const user = Object.values(demoUsers).find(item => item.email.toLowerCase() === identity.toLowerCase() || item.code.toLowerCase() === identity.toLowerCase());
-    if (!user || password !== '123456') return setError('Thông tin đăng nhập không chính xác. Tài khoản demo dùng mật khẩu 123456.');
-    onLogin(user);
+    try {
+      const result = await api.login(identity.trim(), password);
+      localStorage.setItem('tbu_token', result.token);
+      onLogin(result.user);
+      return;
+    } catch {
+        setError('Không thể đăng nhập. Vui lòng kiểm tra tài khoản, mật khẩu và kết nối máy chủ.');
+      }
   };
-  const demo = (key) => { const user = demoUsers[key]; setIdentity(user.email); setPassword('123456'); onLogin(user); };
-  return <AuthShell title="Đăng nhập" subtitle="Đăng nhập để sử dụng đầy đủ các dịch vụ hành chính trực tuyến."><form className="auth-form" onSubmit={submit} noValidate>{error && <div className="auth-alert error"><AlertCircle size={16}/>{error}</div>}<label>Email trường hoặc Mã SV/CBGV<div className="auth-input"><Mail size={17}/><input value={identity} onChange={event => { setIdentity(event.target.value); setError(''); }} placeholder="name@tbu.edu.vn hoặc mã định danh" autoComplete="username" /></div></label><label>Mật khẩu<div className="auth-input"><LockKeyhole size={17}/><input type="password" value={password} onChange={event => { setPassword(event.target.value); setError(''); }} placeholder="Nhập mật khẩu" autoComplete="current-password" /></div></label><div className="auth-options"><label className="auth-check"><input type="checkbox" checked={remember} onChange={event => setRemember(event.target.checked)}/> Ghi nhớ đăng nhập</label><button type="button" className="auth-forgot" onClick={() => navigate('forgot-password')}>Quên mật khẩu?</button></div><button className="primary-btn auth-submit" type="submit"><LogInIcon/> Đăng nhập</button></form><div className="auth-divider"><span>Đăng nhập nhanh với tài khoản demo</span></div><div className="demo-login-grid"><button onClick={() => demo('student')}><span className="demo-avatar student">LA</span><span><b>Đăng nhập Sinh viên</b><small>lananh@tbu.edu.vn</small></span></button><button onClick={() => demo('staff')}><span className="demo-avatar staff">TH</span><span><b>Đăng nhập Cán bộ Một cửa</b><small>thuha@tbu.edu.vn</small></span></button><button onClick={() => demo('admin')}><span className="demo-avatar admin">AD</span><span><b>Đăng nhập Quản trị viên</b><small>admin@tbu.edu.vn</small></span></button></div><p className="auth-switch">Chưa có tài khoản? <button onClick={() => navigate('register')}>Đăng ký ngay</button></p></AuthShell>;
+  return <AuthShell title="Đăng nhập" subtitle="Đăng nhập để sử dụng đầy đủ các dịch vụ hành chính trực tuyến."><form className="auth-form" onSubmit={submit} noValidate>{error && <div className="auth-alert error"><AlertCircle size={16}/>{error}</div>}<label>Email trường hoặc Mã SV/CBGV<div className="auth-input"><Mail size={17}/><input value={identity} onChange={event => { setIdentity(event.target.value); setError(''); }} placeholder="name@tbu.edu.vn hoặc mã định danh" autoComplete="username" /></div></label><label>Mật khẩu<div className="auth-input"><LockKeyhole size={17}/><input type="password" value={password} onChange={event => { setPassword(event.target.value); setError(''); }} placeholder="Nhập mật khẩu" autoComplete="current-password" /></div></label><div className="auth-options"><label className="auth-check"><input type="checkbox" checked={remember} onChange={event => setRemember(event.target.checked)}/> Ghi nhớ đăng nhập</label><button type="button" className="auth-forgot" onClick={() => navigate('forgot-password')}>Quên mật khẩu?</button></div><button className="primary-btn auth-submit" type="submit"><LogInIcon/> Đăng nhập</button></form><p className="auth-switch">Chưa có tài khoản? <button onClick={() => navigate('register')}>Đăng ký ngay</button></p></AuthShell>;
 }
 
 function Register({ onLogin, navigate }) {
-  const [form, setForm] = useState({ name: '', code: '', email: '', phone: '', role: 'student', password: '', confirm: '', terms: false });
+  const { setUsers } = useDataStore();
+  const [form, setForm] = useState({ name: '', code: '', email: '', phone: '', password: '', confirm: '', terms: false });
   const [error, setError] = useState('');
   const update = (key, value) => setForm(current => ({ ...current, [key]: value }));
-  const submit = (event) => {
+  const submit = async (event) => {
     event.preventDefault();
     if (!form.name || !form.code || !form.email || !form.password) return setError('Vui lòng điền các trường bắt buộc.');
     if (!/^[^@\s]+@tbu\.edu\.vn$/i.test(form.email)) return setError('Email phải sử dụng tên miền @tbu.edu.vn.');
     if (form.password.length < 6) return setError('Mật khẩu cần tối thiểu 6 ký tự.');
     if (form.password !== form.confirm) return setError('Mật khẩu xác nhận không khớp.');
     if (!form.terms) return setError('Vui lòng đồng ý với điều khoản sử dụng.');
-    onLogin({ id: `user-${Date.now()}`, name: form.name, email: form.email, code: form.code, role: form.role, avatar: initials(form.name), phone: form.phone, department: form.role === 'student' ? 'Chưa cập nhật' : 'Chưa cập nhật' }, '✅ Đăng ký thành công, chào mừng bạn đến với cổng Một cửa!');
+    try {
+      const result = await api.register({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        code: form.code.trim().toUpperCase(),
+        password: form.password,
+        phone: form.phone.trim(),
+        department: 'Khoa Đào tạo'
+      });
+      localStorage.setItem('tbu_token', result.token);
+      onLogin(result.user, '✅ Đăng ký thành công, chào mừng bạn đến với cổng Một cửa!');
+    } catch (requestError) {
+      setError(requestError.message || 'Không thể tạo tài khoản trên máy chủ.');
+    }
   };
-  return <AuthShell title="Tạo tài khoản" subtitle="Đăng ký tài khoản để nộp và theo dõi hồ sơ trực tuyến."><form className="auth-form register-form" onSubmit={submit} noValidate>{error && <div className="auth-alert error"><AlertCircle size={16}/>{error}</div>}<div className="auth-two-col"><label>Họ và tên *<input value={form.name} onChange={event => update('name', event.target.value)} placeholder="Nguyễn Văn A"/></label><label>Mã định danh *<input value={form.code} onChange={event => update('code', event.target.value)} placeholder="MSV hoặc mã CBGV"/></label></div><div className="auth-two-col"><label>Email trường *<input value={form.email} onChange={event => update('email', event.target.value)} placeholder="name@tbu.edu.vn"/></label><label>Số điện thoại<input value={form.phone} onChange={event => update('phone', event.target.value)} placeholder="0988 123 456"/></label></div><fieldset><legend>Vai trò</legend><label className="role-radio"><input type="radio" checked={form.role === 'student'} onChange={() => update('role', 'student')}/> Sinh viên</label><label className="role-radio"><input type="radio" checked={form.role === 'staff'} onChange={() => update('role', 'staff')}/> Cán bộ - Giảng viên</label></fieldset><div className="auth-two-col"><label>Mật khẩu *<input type="password" value={form.password} onChange={event => update('password', event.target.value)} placeholder="Tối thiểu 6 ký tự"/></label><label>Xác nhận mật khẩu *<input type="password" value={form.confirm} onChange={event => update('confirm', event.target.value)} placeholder="Nhập lại mật khẩu"/></label></div><label className="auth-check terms"><input type="checkbox" checked={form.terms} onChange={event => update('terms', event.target.checked)}/> Tôi đồng ý với <button type="button">điều khoản sử dụng cổng Một cửa</button></label><button className="primary-btn auth-submit" type="submit"><UserCircle size={17}/> Đăng ký tài khoản</button></form><p className="auth-switch">Đã có tài khoản? <button onClick={() => navigate('login')}>Đăng nhập</button></p></AuthShell>;
+  return <AuthShell title="Tạo tài khoản" subtitle="Đăng ký tài khoản để nộp và theo dõi hồ sơ trực tuyến."><form className="auth-form register-form" onSubmit={submit} noValidate>{error && <div className="auth-alert error"><AlertCircle size={16}/>{error}</div>}<div className="auth-two-col"><label>Họ và tên *<input value={form.name} onChange={event => update('name', event.target.value)} placeholder="Nguyễn Văn A"/></label><label>Mã sinh viên *<input value={form.code} onChange={event => update('code', event.target.value)} placeholder="MSV: 22D100123"/></label></div><div className="auth-two-col"><label>Email trường *<input value={form.email} onChange={event => update('email', event.target.value)} placeholder="name@tbu.edu.vn"/></label><label>Số điện thoại<input value={form.phone} onChange={event => update('phone', event.target.value)} placeholder="0988 123 456"/></label></div><div className="auth-two-col"><label>Mật khẩu *<input type="password" value={form.password} onChange={event => update('password', event.target.value)} placeholder="Tối thiểu 6 ký tự"/></label><label>Xác nhận mật khẩu *<input type="password" value={form.confirm} onChange={event => update('confirm', event.target.value)} placeholder="Nhập lại mật khẩu"/></label></div><label className="auth-check terms"><input type="checkbox" checked={form.terms} onChange={event => update('terms', event.target.checked)}/> Tôi đồng ý với <button type="button">điều khoản sử dụng cổng Một cửa</button></label><button className="primary-btn auth-submit" type="submit"><UserCircle size={17}/> Đăng ký tài khoản</button></form><p className="auth-switch">Đã có tài khoản? <button onClick={() => navigate('login')}>Đăng nhập</button></p></AuthShell>;
 }
 
 function ForgotPassword({ navigate }) {
+  const { setUsers } = useDataStore();
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [otp, setOtp] = useState('');
+  const [newPass, setNewPass] = useState('');
   const [seconds, setSeconds] = useState(60);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   useEffect(() => { if (!sent || seconds <= 0) return undefined; const timer = window.setInterval(() => setSeconds(value => value - 1), 1000); return () => window.clearInterval(timer); }, [sent, seconds]);
-  const sendOtp = (event) => { event.preventDefault(); if (/^[^@\s]+@tbu\.edu\.vn$/i.test(email)) { setSent(true); setSeconds(60); } };
-  return <AuthShell title="Quên mật khẩu?" subtitle="Nhập email trường để nhận mã xác nhận đặt lại mật khẩu."><form className="auth-form" onSubmit={sendOtp}>{!sent ? <><label>Email trường<div className="auth-input"><Mail size={17}/><input value={email} onChange={event => setEmail(event.target.value)} placeholder="name@tbu.edu.vn"/></div></label><button className="primary-btn auth-submit" type="submit"><KeyRound size={17}/> Gửi mã OTP</button></> : <><div className="auth-alert success"><CheckCircle2 size={16}/> Mã OTP đã được gửi đến {email}</div><label>Mã OTP<input value={otp} onChange={event => setOtp(event.target.value)} placeholder="Nhập 6 số xác nhận"/></label><label>Mật khẩu mới<input type="password" placeholder="Nhập mật khẩu mới"/></label><button className="primary-btn auth-submit" type="button" onClick={() => navigate('login')}>Đặt lại mật khẩu</button><p className="otp-countdown">{seconds > 0 ? `Có thể gửi lại sau ${seconds}s` : <button type="button" onClick={() => { setSeconds(60); setOtp(''); }}>Gửi lại mã OTP</button>}</p></>}</form><p className="auth-switch"><button onClick={() => navigate('login')}>← Quay lại đăng nhập</button></p></AuthShell>;
+  const sendOtp = (event) => {
+    event.preventDefault();
+    if (!email.trim() || !/^[^@\s]+@tbu\.edu\.vn$/i.test(email)) return setError('Vui lòng nhập đúng email trường có đuôi @tbu.edu.vn.');
+    setError('');
+    setSent(true);
+    setSeconds(60);
+  };
+  const handleResetPassword = () => {
+    if (!otp.trim()) return setError('Vui lòng nhập mã OTP.');
+    if (!newPass || newPass.length < 6) return setError('Mật khẩu mới phải có tối thiểu 6 ký tự.');
+    setError('');
+    setUsers(prev => prev.map(u => u.email.toLowerCase() === email.toLowerCase() ? { ...u, password: newPass } : u));
+    setSuccess('✅ Mật khẩu đã được đặt lại thành công! Đang chuyển về trang đăng nhập...');
+    setTimeout(() => navigate('login'), 1800);
+  };
+  return <AuthShell title="Quên mật khẩu?" subtitle="Nhập email trường để nhận mã xác nhận đặt lại mật khẩu."><form className="auth-form" onSubmit={sendOtp}>{error && <div className="auth-alert error"><AlertCircle size={16}/>{error}</div>}{success && <div className="auth-alert success"><CheckCircle2 size={16}/>{success}</div>}{!sent ? <><label>Email trường<div className="auth-input"><Mail size={17}/><input value={email} onChange={event => { setEmail(event.target.value); setError(''); }} placeholder="name@tbu.edu.vn"/></div></label><button className="primary-btn auth-submit" type="submit"><KeyRound size={17}/> Gửi mã OTP</button></> : <><div className="auth-alert success"><CheckCircle2 size={16}/> Mã OTP (123456) đã gửi đến {email}</div><label>Mã OTP<input value={otp} onChange={event => setOtp(event.target.value)} placeholder="Nhập mã 6 số (mẫu: 123456)"/></label><label>Mật khẩu mới<input type="password" value={newPass} onChange={event => setNewPass(event.target.value)} placeholder="Tối thiểu 6 ký tự"/></label><button className="primary-btn auth-submit" type="button" onClick={handleResetPassword}>Đặt lại mật khẩu</button><p className="otp-countdown">{seconds > 0 ? `Có thể gửi lại sau ${seconds}s` : <button type="button" onClick={() => { setSeconds(60); setOtp(''); }}>Gửi lại mã OTP</button>}</p></>}</form><p className="auth-switch"><button onClick={() => navigate('login')}>← Quay lại đăng nhập</button></p></AuthShell>;
 }
 
 function LogInIcon() { return <ArrowRight size={17}/>; }
@@ -589,7 +765,11 @@ function AdminProcedures() {
 
 function AdminSideRail({ active }) {
   const [collapsed, setCollapsed] = useState(false);
-  return <aside className={collapsed ? 'admin-sidebar rail-collapsed' : 'admin-sidebar'}><button className="admin-logo" onClick={() => adminNavigate('/admin')}><span className="brand-mark"><Building2 size={21} /></span><span><b>ĐẠI HỌC THÁI BÌNH</b><small>QUẢN TRỊ HỆ THỐNG</small></span></button><nav className="admin-nav">{adminMenu.map(group => <div className="admin-nav-group" key={group.section}><small className="admin-section">{group.section}</small>{group.items.map(([label, Icon]) => <button onClick={() => label === 'Dashboard' ? adminNavigate('/admin') : label === 'Thủ tục hành chính' ? adminNavigate('/admin/procedures') : label === 'Biểu mẫu' ? adminNavigate('/admin/forms') : label === 'Quy trình' ? adminNavigate('/admin/processes') : label === 'Hồ sơ / Yêu cầu' ? adminNavigate('/admin/applications') : label === 'Knowledge Base' ? adminNavigate('/admin/knowledge-base') : label === 'Người dùng' ? adminNavigate('/admin/users') : label === 'FAQ' ? adminNavigate('/admin/faq') : label === 'Tin tức' ? adminNavigate('/admin/news')   : label === 'Thống kê' ? adminNavigate('/admin/reports') : label === 'Cài đặt' ? adminNavigate('/admin/settings') : undefined} className={label === active ? 'admin-nav-item active' : 'admin-nav-item'} key={label} title={label}><Icon size={18} /><span>{label}</span></button>)}</div>)}</nav><div className="admin-sidebar-bottom"><div className="admin-user"><span className="admin-avatar">AD</span><span><b>Admin</b><small>Quản trị viên</small></span><MoreHorizontal size={16} /></div><button className="logout-btn" onClick={() => adminNavigate('/')}><LogOut size={16} /><span>Đăng xuất</span></button><button className="collapse-btn" onClick={() => setCollapsed(!collapsed)}>{collapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}<span>{collapsed ? 'Mở rộng menu' : 'Thu gọn menu'}</span></button></div></aside>;
+  const currentUser = (() => { try { return JSON.parse(localStorage.getItem('currentUser')) || {}; } catch { return {}; } })();
+  const adminOnly = new Set(['Knowledge Base', 'FAQ', 'Tin tức', 'Người dùng', 'Thống kê', 'Cài đặt']);
+  const visibleMenu = isAdmin(currentUser) ? adminMenu : adminMenu.map(group => ({ ...group, items: group.items.filter(([label]) => !adminOnly.has(label)) })).filter(group => group.items.length);
+  const destinations = { Dashboard: '/admin', 'Thủ tục hành chính': '/admin/procedures', 'Biểu mẫu': '/admin/forms', 'Quy trình': '/admin/processes', 'Hồ sơ / Yêu cầu': '/admin/applications', 'Knowledge Base': '/admin/knowledge-base', 'Người dùng': '/admin/users', FAQ: '/admin/faq', 'Tin tức': '/admin/news', 'Thống kê': '/admin/reports', 'Cài đặt': '/admin/settings' };
+  return <aside className={collapsed ? 'admin-sidebar rail-collapsed' : 'admin-sidebar'}><button className="admin-logo" onClick={() => adminNavigate('/admin')}><span className="brand-mark"><Building2 size={21} /></span><span><b>ĐẠI HỌC THÁI BÌNH</b><small>{isAdmin(currentUser) ? 'QUẢN TRỊ HỆ THỐNG' : 'NGHIỆP VỤ MỘT CỬA'}</small></span></button><nav className="admin-nav">{visibleMenu.map(group => <div className="admin-nav-group" key={group.section}><small className="admin-section">{group.section}</small>{group.items.map(([label, Icon]) => <button onClick={() => adminNavigate(destinations[label])} className={label === active ? 'admin-nav-item active' : 'admin-nav-item'} key={label} title={label}><Icon size={18} /><span>{label}</span></button>)}</div>)}</nav><div className="admin-sidebar-bottom"><div className="admin-user"><span className="admin-avatar">{initials(currentUser.name || 'Cán bộ')}</span><span><b>{currentUser.name || 'Cán bộ'}</b><small>{isAdmin(currentUser) ? 'Quản trị viên' : 'Cán bộ Một cửa'}</small></span><MoreHorizontal size={16} /></div><button className="logout-btn" onClick={() => adminNavigate('/')}><LogOut size={16} /><span>Đăng xuất</span></button><button className="collapse-btn" onClick={() => setCollapsed(!collapsed)}>{collapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}<span>{collapsed ? 'Mở rộng menu' : 'Thu gọn menu'}</span></button></div></aside>;
 }
 
 function ReceiptModal({ item, onClose }) {
@@ -634,9 +814,10 @@ function NotificationButton({ audience = 'admin' }) {
 }
 
 function AdminTopbar({ title = 'Thủ tục hành chính' }) {
+  const currentUser = (() => { try { return JSON.parse(localStorage.getItem('currentUser')) || {}; } catch { return {}; } })();
   const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains('dark-mode'));
   const toggleTheme = () => { setDarkMode(value => !value); document.documentElement.classList.toggle('dark-mode', !darkMode); localStorage.setItem('tbu-theme', !darkMode ? 'dark' : 'light'); };
-  return <header className="admin-topbar"><div className="admin-breadcrumb"><span>Quản lý</span><ArrowRight size={13} /><b>{title}</b></div><div className="admin-top-actions"><button className="admin-search" aria-label="Tìm kiếm"><Search size={17} /><span>Tìm kiếm...</span><kbd>⌘ K</kbd></button><button className="theme-toggle" aria-label={darkMode ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối'} onClick={toggleTheme}>{darkMode ? '☀' : '◐'}</button><NotificationButton audience="admin" /><div className="admin-top-user"><span className="admin-avatar">AD</span><span><b>Admin</b><small>Quản trị viên</small></span><ChevronDown size={14} /></div></div></header>;
+  return <header className="admin-topbar"><div className="admin-breadcrumb"><span>Quản lý</span><ArrowRight size={13} /><b>{title}</b></div><div className="admin-top-actions"><button className="admin-search" aria-label="Tìm kiếm"><Search size={17} /><span>Tìm kiếm...</span><kbd>⌘ K</kbd></button><button className="theme-toggle" aria-label={darkMode ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối'} onClick={toggleTheme}>{darkMode ? '☀' : '◐'}</button><NotificationButton audience="admin" /><div className="admin-top-user"><span className="admin-avatar">{initials(currentUser.name || 'Cán bộ')}</span><span><b>{currentUser.name || 'Cán bộ Một cửa'}</b><small>{isAdmin(currentUser) ? 'Quản trị viên' : 'Cán bộ xử lý'}</small></span><ChevronDown size={14} /></div></div></header>;
 }
 
 const knowledgeSeed = [
@@ -715,7 +896,8 @@ const userSeed = [
 ].map((u,i)=>({id:i+1,name:u[0],email:u[1],code:u[2],role:u[3],status:u[4],created:u[5],last:u[6]}));
 
 function AdminUsers(){
-  const [users,setUsers]=useState(userSeed),[query,setQuery]=useState(''),[role,setRole]=useState(''),[status,setStatus]=useState(''),[modal,setModal]=useState(null),[tab,setTab]=useState('users');
+  const [users,setUsers]=useState([]),[query,setQuery]=useState(''),[role,setRole]=useState(''),[status,setStatus]=useState(''),[modal,setModal]=useState(null),[tab,setTab]=useState('users');
+  useEffect(() => { api.getUsers().then(setUsers).catch(error => console.error('Không thể tải người dùng:', error)); }, []);
   const filtered=users.filter(u=>(!query||`${u.name} ${u.email}`.toLowerCase().includes(query.toLowerCase()))&&(!role||u.role===role)&&(!status||u.status===status));
   return <div className="admin-shell"><AdminSideRail active="Người dùng"/><section className="admin-main"><AdminTopbar title="Người dùng"/><main className="admin-content users-content"><div className="admin-page-heading"><div><div className="admin-breadcrumb inner-breadcrumb"><span>Hệ thống</span><ArrowRight size={13}/><b>Người dùng</b></div><h1>Quản lý Người dùng</h1><p>Quản lý tài khoản, vai trò và quyền truy cập hệ thống.</p></div><button className="admin-primary-btn" onClick={()=>setModal({mode:'add'})}><Plus size={16}/> Thêm người dùng</button></div><div className="user-stats">{[['Tổng người dùng','1,234','users'],['Sinh viên','1,100','student'],['CBGV','120','staff'],['Admin','14','admin']].map(x=><div key={x[0]}><span className={`user-stat-icon ${x[2]}`}><Users size={18}/></span><small>{x[0]}</small><strong>{x[1]}</strong></div>)}</div><div className="kb-tabs"><button className={tab==='users'?'selected':''} onClick={()=>setTab('users')}>Danh sách người dùng</button><button className={tab==='permissions'?'selected':''} onClick={()=>setTab('permissions')}>Phân quyền</button></div>{tab==='users'?<><div className="procedure-filter-bar"><div className="admin-filter-search"><Search size={16}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Tìm theo họ tên hoặc email..."/></div><select value={role} onChange={e=>setRole(e.target.value)}><option value="">Tất cả vai trò</option><option>Admin</option><option>Cán bộ xử lý</option><option>Sinh viên</option><option>CBGV</option></select><select value={status} onChange={e=>setStatus(e.target.value)}><option value="">Tất cả trạng thái</option><option>Active</option><option>Locked</option></select></div><div className="procedures-table-card"><div className="table-toolbar"><span>Danh sách người dùng <b>{filtered.length}</b></span><small>Hiển thị 1-{filtered.length} trong tổng số 1,234</small></div><div className="admin-table-scroll"><table className="procedures-table users-table"><thead><tr><th>□</th><th>NGƯỜI DÙNG</th><th>EMAIL</th><th>MÃ SV/CBGV</th><th>VAI TRÒ</th><th>TRẠNG THÁI</th><th>NGÀY TẠO</th><th>ĐĂNG NHẬP CUỐI</th><th>HÀNH ĐỘNG</th></tr></thead><tbody>{filtered.map(u=><tr key={u.id}><td><input type="checkbox"/></td><td><span className="user-cell-avatar">{u.name.split(' ').slice(-1)[0][0]}{u.name.split(' ').slice(-2,-1)[0]?.[0]}</span><strong>{u.name}</strong></td><td>{u.email}</td><td>{u.code}</td><td><span className={`role-badge role-${u.role.replaceAll(' ','-')}`}>{u.role}</span></td><td><span className={`user-status ${u.status.toLowerCase()}`}><i/>{u.status==='Active'?'Hoạt động':'Đã khóa'}</span></td><td>{u.created}</td><td>{u.last}</td><td><div className="row-actions"><button onClick={()=>setModal({mode:'edit',user:u})}><Pencil size={15}/></button><button title={u.status==='Active'?'Khóa':'Mở khóa'} onClick={()=>setUsers(v=>v.map(x=>x.id===u.id?{...x,status:x.status==='Active'?'Locked':'Active'}:x))}>{u.status==='Active'?<ShieldCheck size={15}/>:<Check size={15}/>}</button><button className="danger-icon" onClick={()=>setUsers(v=>v.filter(x=>x.id!==u.id))}><Trash2 size={15}/></button></div></td></tr>)}</tbody></table></div></div></>:<PermissionMatrix/>}</main></section>{modal&&<UserDialog initial={modal.user} onClose={()=>setModal(null)} onSave={u=>{setUsers(v=>modal.mode==='edit'?v.map(x=>x.id===u.id?u:x):[{...u,id:Date.now(),created:'10/10/2026',last:'Chưa đăng nhập'},...v]);setModal(null)}}/>}</div>
 }
@@ -725,7 +907,7 @@ function UserDialog({initial,onClose,onSave}){const [form,setForm]=useState(init
 function PermissionMatrix(){const rows=['Admin','Cán bộ xử lý','Sinh viên','CBGV'],cols=['Quản lý TTHC','Quản lý hồ sơ','Quản lý KB','Quản lý users','Xem báo cáo','Xử lý hồ sơ'];return <div className="permission-card"><div className="table-toolbar"><span>Ma trận phân quyền</span><small>Quyền truy cập theo vai trò</small></div><table className="permission-table"><thead><tr><th>VAI TRÒ</th>{cols.map(c=><th key={c}>{c}</th>)}</tr></thead><tbody>{rows.map((r,i)=><tr key={r}><td><b>{r}</b></td>{cols.map((c,j)=><td key={c}><input type="checkbox" defaultChecked={i===0||j<=(i===1?4:i===3?1:0)}/></td>)}</tr>)}</tbody></table></div>}
 
 const faqSeed=['Làm thế nào để nộp hồ sơ trực tuyến?','Hồ sơ xác nhận sinh viên gồm những giấy tờ gì?','Thời gian xử lý hồ sơ là bao lâu?','Tôi có thể theo dõi hồ sơ bằng cách nào?','Làm sao để tải biểu mẫu hành chính?','Quên mật khẩu tài khoản phải làm gì?','Đơn xin nghỉ phép cần được gửi cho ai?','Hồ sơ bị yêu cầu bổ sung thì xử lý thế nào?','Tôi có thể liên hệ Bộ phận Một cửa qua đâu?','AI Chatbot có thể hỗ trợ những nội dung gì?'].map((q,i)=>({id:i,question:q,category:['Thủ tục chung','Sinh viên','Thủ tục chung','Kỹ thuật','CBGV'][i%5],views:1240-i*73,active:i!==8,answer:'Bạn có thể thực hiện theo hướng dẫn trên Cổng dịch vụ hành chính trực tuyến của Trường Đại học Thái Bình. Vui lòng chuẩn bị đầy đủ hồ sơ và theo dõi thông báo xử lý.'}));
-function AdminFaq(){const [faqs,setFaqs]=useState(faqSeed),[cat,setCat]=useState('Tất cả'),[open,setOpen]=useState(null),[modal,setModal]=useState(null);const filtered=faqs.filter(x=>cat==='Tất cả'||x.category===cat);return <div className="admin-shell"><AdminSideRail active="FAQ"/><section className="admin-main"><AdminTopbar title="FAQ"/><main className="admin-content faq-content"><div className="admin-page-heading"><div><div className="admin-breadcrumb inner-breadcrumb"><span>AI & Nội dung</span><ArrowRight size={13}/><b>FAQ</b></div><h1>Quản lý FAQ</h1><p>Quản lý các câu hỏi thường gặp và câu trả lời cho người dùng.</p></div><button className="admin-primary-btn" onClick={()=>setModal({})}><Plus size={16}/> Thêm câu hỏi</button></div><div className="kb-tabs faq-tabs">{['Tất cả','Thủ tục chung','Sinh viên','CBGV','Kỹ thuật'].map(x=><button className={cat===x?'selected':''} onClick={()=>setCat(x)} key={x}>{x}</button>)}</div><div className="faq-list">{filtered.map(item=><div className="faq-item" key={item.id}><GripVertical className="faq-grip" size={17}/><div className="faq-main"><div className="faq-question" onClick={()=>setOpen(open===item.id?null:item.id)}><b>{item.question}</b><span className="audience-tag">{item.category}</span><small>{item.views.toLocaleString('vi-VN')} lượt xem</small><ChevronDown size={15}/></div>{open===item.id&&<p className="faq-answer">{item.answer}</p>}</div><button className={item.active?'status-toggle on':'status-toggle'} onClick={()=>setFaqs(v=>v.map(x=>x.id===item.id?{...x,active:!x.active}:x))}><span/></button><span className="faq-visible">{item.active?'Hiển thị':'Ẩn'}</span><div className="row-actions"><button onClick={()=>setModal(item)}><Pencil size={15}/></button><button className="danger-icon" onClick={()=>setFaqs(v=>v.filter(x=>x.id!==item.id))}><Trash2 size={15}/></button></div></div>)}</div></main></section>{modal&&<FaqDialog initial={modal.question?modal:null} onClose={()=>setModal(null)} onSave={item=>{setFaqs(v=>modal.question?v.map(x=>x.id===item.id?item:x):[{...item,id:Date.now(),views:0},...v]);setModal(null)}}/>}</div>}
+function AdminFaq(){const [faqs,setFaqs]=useState([]),[cat,setCat]=useState('Tất cả'),[open,setOpen]=useState(null),[modal,setModal]=useState(null);useEffect(()=>{api.getFaqs().then(setFaqs).catch(error=>console.error('Không thể tải FAQ:',error));},[]);const filtered=faqs.filter(x=>cat==='Tất cả'||x.category===cat);return <div className="admin-shell"><AdminSideRail active="FAQ"/><section className="admin-main"><AdminTopbar title="FAQ"/><main className="admin-content faq-content"><div className="admin-page-heading"><div><div className="admin-breadcrumb inner-breadcrumb"><span>AI & Nội dung</span><ArrowRight size={13}/><b>FAQ</b></div><h1>Quản lý FAQ</h1><p>Quản lý các câu hỏi thường gặp và câu trả lời cho người dùng.</p></div><button className="admin-primary-btn" onClick={()=>setModal({})}><Plus size={16}/> Thêm câu hỏi</button></div><div className="kb-tabs faq-tabs">{['Tất cả','Thủ tục chung','Sinh viên','CBGV','Kỹ thuật'].map(x=><button className={cat===x?'selected':''} onClick={()=>setCat(x)} key={x}>{x}</button>)}</div><div className="faq-list">{filtered.map(item=><div className="faq-item" key={item.id}><GripVertical className="faq-grip" size={17}/><div className="faq-main"><div className="faq-question" onClick={()=>setOpen(open===item.id?null:item.id)}><b>{item.question}</b><span className="audience-tag">{item.category}</span><small>{Number(item.views || 0).toLocaleString('vi-VN')} lượt xem</small><ChevronDown size={15}/></div>{open===item.id&&<p className="faq-answer">{item.answer}</p>}</div><span className="faq-visible">{item.active===false?'Ẩn':'Hiển thị'}</span></div>)}</div></main></section></div>}
 function FaqDialog({initial,onClose,onSave}){const [form,setForm]=useState(initial||{question:'',answer:'',category:'Thủ tục chung',active:true});const u=(k,v)=>setForm(x=>({...x,[k]:v}));return <div className="modal-backdrop"><div className="faq-dialog"><div className="editor-header"><div><span className="label">NỘI DUNG TRỢ GIÚP</span><h2>{initial?'Chỉnh sửa câu hỏi':'Thêm câu hỏi'}</h2></div><button onClick={onClose}><X size={20}/></button></div><div className="editor-body"><label className="full-field">Câu hỏi<input value={form.question} onChange={e=>u('question',e.target.value)} placeholder="Nhập câu hỏi thường gặp..."/></label><label className="full-field">Trả lời<div className="rich-editor"><div><b>B</b><i>I</i><span>• Danh sách</span><span>🔗 Liên kết</span></div><textarea rows="7" value={form.answer} onChange={e=>u('answer',e.target.value)} placeholder="Nhập nội dung trả lời..."/></div></label><div className="editor-grid"><label>Danh mục<select value={form.category} onChange={e=>u('category',e.target.value)}><option>Thủ tục chung</option><option>Sinh viên</option><option>CBGV</option><option>Kỹ thuật</option></select></label><label>Thứ tự hiển thị<input type="number" defaultValue="1"/></label></div><div className="user-toggle-row"><span>Trạng thái hiển thị</span><button className={form.active?'status-toggle on':'status-toggle'} onClick={()=>u('active',!form.active)}><span/></button><b>{form.active?'Hiển thị':'Ẩn'}</b></div></div><div className="editor-footer"><button className="admin-outline-btn" onClick={onClose}>Hủy</button><button className="admin-primary-btn" onClick={()=>onSave({...form,question:form.question||'Câu hỏi mới'})}><Save size={15}/> Lưu câu hỏi</button></div></div></div>}
 
 const newsSeed=[['Triển khai cổng dịch vụ hành chính trực tuyến phiên bản mới','Thông báo','Nguyễn Văn Admin','08/10/2026','2,345','Published'],['Hướng dẫn cập nhật thông tin tài khoản người dùng','Hướng dẫn','Trần Minh Đức','02/10/2026','1,876','Published'],['Lịch tiếp nhận hồ sơ trực tiếp tại Bộ phận Một cửa','Thông báo','Lê Thu Hà','25/09/2026','1,204','Published'],['Khai giảng năm học mới 2026-2027','Tin tức','Phòng Truyền thông','15/09/2026','3,421','Published'],['Thông báo lịch nghỉ lễ Quốc khánh','Thông báo','Nguyễn Văn Admin','01/09/2026','987','Draft']].map((n,i)=>({id:i,title:n[0],category:n[1],author:n[2],date:n[3],views:n[4],status:n[5]}));
@@ -768,15 +950,32 @@ function AdminApplications() {
   const [receipt, setReceipt] = useState(null);
   const [dragged, setDragged] = useState(null);
   useEffect(() => {
+    if (!localStorage.getItem('tbu_token')) return;
+    api.getApplications().then(rows => setApplications(rows.map(applicationFromApi)))
+      .catch(error => console.error('Không thể tải hồ sơ thực tế:', error));
+  }, [setApplications]);
+  useEffect(() => {
     const code = new URLSearchParams(window.location.search).get('code');
     if (code) setSelected(applications.find(item => item.code === code) || null);
   }, [applications]);
   const filtered = applications.filter(item => (!query || `${item.code} ${item.applicant}`.toLowerCase().includes(query.toLowerCase())) && (!dept || item.dept === dept) && (!procedure || item.procedure === procedure));
-  const moveApplication = (code, status) => setApplications(value => value.map(item => {
-    if (item.code !== code) return item;
-    addNotification({ audience: item.email || item.applicant, type: 'application-status', text: `Hồ sơ ${code} của bạn đã chuyển sang trạng thái: ${status}`, code });
-    return {...item, status, updatedAt: new Date().toISOString(), timeline: [...(item.timeline || []), { status, at: new Date().toISOString(), by: 'Cán bộ xử lý', note: item.note || '' }]};
-  }));
+  const moveApplication = async (code, status) => {
+    const item = applications.find(application => application.code === code);
+    if (localStorage.getItem('tbu_token')) {
+      try {
+        const updated = await api.updateApplicationStatus(code, { status, staff_name: 'Cán bộ Một cửa' });
+        setApplications(value => value.map(application => application.code === code ? applicationFromApi(updated) : application));
+      } catch (error) {
+        console.error('Không thể cập nhật trạng thái hồ sơ:', error);
+        return;
+      }
+    } else {
+      setApplications(value => value.map(application => application.code === code
+        ? { ...application, status, updatedAt: new Date().toISOString(), timeline: [...(application.timeline || []), { status, at: new Date().toISOString(), by: 'Cán bộ xử lý' }] }
+        : application));
+    }
+    if (item) addNotification({ audience: item.email || item.applicant, type: 'application-status', text: `Hồ sơ ${code} của bạn đã chuyển sang trạng thái: ${status}`, code });
+  };
   const saveNote = (code, entry) => {
     setApplications(value => value.map(item => item.code === code
       ? { ...item, notes: [entry, ...(item.notes || [])], timeline: [...(item.timeline || []), { status: item.status, at: new Date().toISOString(), by: entry.by, note: entry.text }] }
@@ -799,7 +998,9 @@ function ApplicationDetail({item,onClose,onStatus,onNote,onReceipt}) {
   const [note,setNote] = useState('');
   const [notes,setNotes] = useState(item.notes || [{text:'Đã kiểm tra hồ sơ, thông tin đầy đủ.',by:'Nguyễn Minh Đức',time:'08/10/2026 · 10:05'}]);
   const addNote=()=>{if(note.trim()){const entry={text:note,by:'Admin',time:'Vừa xong'};setNotes(value=>[entry,...value]);onNote?.(entry);setNote('');setNoteMode('');}};
-  return <div className="application-detail-backdrop"><aside className="application-detail"><div className="detail-header"><div><small>MÃ HỒ SƠ</small><h2>{item.code}</h2><span className={`application-status status-${applicationStatuses.indexOf(item.status)}`}>{item.status}</span></div><button onClick={onClose}><X size={19}/></button></div><div className="detail-scroll"><DetailSection title="Thông tin người nộp"><div className="applicant-profile"><span className="large-avatar">{item.staff}</span><div><b>{item.applicant}</b><small>21D100123 · Sinh viên</small></div></div><div className="detail-info-grid"><span>Email<b>lananh@tbu.edu.vn</b></span><span>Số điện thoại<b>0988 123 456</b></span><span>Đơn vị / Khoa<b>Khoa Kinh tế</b></span><span>Ngày nộp<b>{item.date}</b></span></div></DetailSection><DetailSection title="Thông tin thủ tục"><div className="procedure-summary"><FileText size={19}/><div><b>{item.procedure}</b><small>{item.dept} · Xử lý trong 3-5 ngày</small></div></div></DetailSection><DetailSection title="Hồ sơ đính kèm"><div className="attached-file"><FileText size={17}/><span><b>don-de-nghi-xac-nhan.pdf</b><small>245 KB · Đã tải lên 08/10/2026</small></span><button>↓</button><button>⌕</button></div><div className="attached-file"><FileText size={17}/><span><b>the-sinh-vien.jpg</b><small>1.2 MB · Đã tải lên 08/10/2026</small></span><button>↓</button><button>⌕</button></div></DetailSection><DetailSection title="Tiến trình xử lý"><div className="detail-timeline">{['Đã tiếp nhận','Đang xử lý','Chờ bổ sung','Hoàn thành'].map((status,index)=><div className={index<=applicationStatuses.indexOf(item.status)?'detail-timeline-item done':'detail-timeline-item'} key={status}><i/ ><div><b>{status}</b><small>{index<2?'08/10/2026 · '+(index?'10:05':'09:12'):'Dự kiến cập nhật'}</small><p>{index===0?'Hồ sơ được tiếp nhận trên cổng trực tuyến.':index===1?'Phòng chuyên môn đang kiểm tra và xử lý.':''}</p></div></div>)}</div></DetailSection><DetailSection title="Thao tác xử lý"><div className="detail-actions"><label>Chuyển trạng thái<select value={item.status} onChange={e=>onStatus(e.target.value)}>{applicationStatuses.map(x=><option key={x}>{x}</option>)}</select></label><label>Giao cho<select defaultValue="Nguyễn Minh Đức"><option>Nguyễn Minh Đức</option><option>Trần Thu Hà</option><option>Lê Quang Huy</option></select></label><div className="detail-action-buttons"><button onClick={()=>setNoteMode('supplement')}>Yêu cầu bổ sung</button><button onClick={()=>setNoteMode('note')}>Ghi chú xử lý</button>  <button onClick={onReceipt}>In phiếu hẹn trả kết quả</button></div>{noteMode && <div className="note-composer"><textarea value={note} onChange={e=>setNote(e.target.value)} placeholder={noteMode==='supplement'?'Nhập nội dung cần bổ sung...':'Nhập ghi chú nội bộ...'} /><button onClick={addNote}>Lưu ghi chú</button></div>}</div></DetailSection><DetailSection title="Ghi chú nội bộ"><div className="internal-notes">{notes.map((entry,index)=><div key={index}><span className="staff-avatar">AD</span><p>{entry.text}<small>{entry.by} · {entry.time}</small></p></div>)}</div><div className="quick-note"><input value={noteMode?'':note} onChange={e=>setNote(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addNote()} placeholder="Thêm ghi chú nhanh..."/><button onClick={addNote}><Send size={14}/></button></div></DetailSection></div></aside></div>;
+  const applicantEmail = item.email || `${item.applicant.toLowerCase().replace(/[^a-z0-9]+/g, '')}@tbu.edu.vn`;
+  const applicantFiles = item.files?.length ? item.files : ['don-de-nghi-theo-mau.pdf', 'giay-to-dinh-danh.pdf'];
+  return <div className="application-detail-backdrop"><aside className="application-detail"><div className="detail-header"><div><small>MÃ HỒ SƠ</small><h2>{item.code}</h2><span className={`application-status status-${applicationStatuses.indexOf(item.status)}`}>{item.status}</span></div><button onClick={onClose}><X size={19}/></button></div><div className="detail-scroll"><DetailSection title="Thông tin người nộp"><div className="applicant-profile"><span className="large-avatar">{item.staff || 'SV'}</span><div><b>{item.applicant}</b><small>Mã HS: {item.code} · Người nộp</small></div></div><div className="detail-info-grid"><span>Email<b>{applicantEmail}</b></span><span>Số điện thoại<b>{item.phone || '0988 123 456'}</b></span><span>Đơn vị / Khoa<b>{item.dept || 'Bộ phận Một cửa'}</b></span><span>Ngày nộp<b>{item.date}</b></span></div></DetailSection><DetailSection title="Thông tin thủ tục"><div className="procedure-summary"><FileText size={19}/><div><b>{item.procedure}</b><small>{item.dept || 'Bộ phận Một cửa'} · Xử lý theo quy định</small></div></div></DetailSection><DetailSection title="Hồ sơ đính kèm">{applicantFiles.map((file, idx) => { const fileName = typeof file === 'string' ? file : file.name; return <div className="attached-file" key={idx}><FileText size={17}/><span><b>{fileName}</b><small>Tài liệu hồ sơ số · Đã đính kèm</small></span>{file.url ? <a title="Tải về" href={file.url} target="_blank" rel="noreferrer">↓</a> : <button title="Tải về" onClick={() => downloadSampleFile(fileName, item.procedure)}>↓</button>} {file.url ? <a title="Xem tài liệu" href={file.url} target="_blank" rel="noreferrer">⌕</a> : <button title="Xem tài liệu" onClick={() => alert(`Xem tài liệu: ${fileName}`)}>⌕</button>}</div>; })}</DetailSection><DetailSection title="Tiến trình xử lý"><div className="detail-timeline">{['Đã tiếp nhận','Đang xử lý','Chờ bổ sung','Hoàn thành'].map((status,index)=><div className={index<=applicationStatuses.indexOf(item.status)?'detail-timeline-item done':'detail-timeline-item'} key={status}><i/ ><div><b>{status}</b><small>{index<2?'08/10/2026 · '+(index?'10:05':'09:12'):'Dự kiến cập nhật'}</small><p>{index===0?'Hồ sơ được tiếp nhận trên cổng trực tuyến.':index===1?'Phòng chuyên môn đang kiểm tra và xử lý.':''}</p></div></div>)}</div></DetailSection><DetailSection title="Thao tác xử lý"><div className="detail-actions"><label>Chuyển trạng thái<select value={item.status} onChange={e=>onStatus(e.target.value)}>{applicationStatuses.map(x=><option key={x}>{x}</option>)}</select></label><label>Giao cho<select defaultValue="Nguyễn Minh Đức"><option>Nguyễn Minh Đức</option><option>Trần Thu Hà</option><option>Lê Quang Huy</option></select></label><div className="detail-action-buttons"><button onClick={()=>setNoteMode('supplement')}>Yêu cầu bổ sung</button><button onClick={()=>setNoteMode('note')}>Ghi chú xử lý</button>  <button onClick={onReceipt}>In phiếu hẹn trả kết quả</button></div>{noteMode && <div className="note-composer"><textarea value={note} onChange={e=>setNote(e.target.value)} placeholder={noteMode==='supplement'?'Nhập nội dung cần bổ sung...':'Nhập ghi chú nội bộ...'} /><button onClick={addNote}>Lưu ghi chú</button></div>}</div></DetailSection><DetailSection title="Ghi chú nội bộ"><div className="internal-notes">{notes.map((entry,index)=><div key={index}><span className="staff-avatar">AD</span><p>{entry.text}<small>{entry.by} · {entry.time}</small></p></div>)}</div><div className="quick-note"><input value={noteMode?'':note} onChange={e=>setNote(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addNote()} placeholder="Thêm ghi chú nhanh..."/><button onClick={addNote}><Send size={14}/></button></div></DetailSection></div></aside></div>;
 }
 
 function DetailSection({title,children}) { return <section className="detail-section"><h3>{title}</h3>{children}</section>; }
@@ -833,7 +1034,7 @@ function AdminForms() {
   const [history, setHistory] = useState(null);
   const filtered = forms.filter(item => (!query || `${item.name} ${item.code}`.toLowerCase().includes(query.toLowerCase())) && (!category || item.category === category) && (!department || item.dept === department));
   const toggle = code => setSelected(value => value.includes(code) ? value.filter(item => item !== code) : [...value, code]);
-  return <div className="admin-shell"><AdminSideRail active="Biểu mẫu" /><section className="admin-main"><AdminTopbar /><main className="admin-content procedures-admin-content"><div className="admin-page-heading"><div><div className="admin-breadcrumb inner-breadcrumb"><span>Quản lý</span><ArrowRight size={13} /><b>Biểu mẫu</b></div><h1>Quản lý Biểu mẫu</h1><p>Quản lý kho biểu mẫu và tài liệu hành chính của nhà trường.</p></div><button className="admin-primary-btn" onClick={() => setUploadOpen(true)}><UploadCloud size={16} /> Upload biểu mẫu</button></div><div className="procedure-filter-bar"><div className="admin-filter-search"><Search size={16} /><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Tìm theo tên biểu mẫu..." /></div><select value={category} onChange={e => setCategory(e.target.value)}><option value="">Tất cả danh mục</option>{['Nghỉ phép','Lương','HĐLĐ','Tập huấn','Chuyển CT','Đào tạo'].map(x => <option key={x}>{x}</option>)}</select><select value={department} onChange={e => setDepartment(e.target.value)}><option value="">Tất cả phòng ban</option>{['TCCB','KHTC','KHCN','Đào tạo','Văn phòng'].map(x => <option key={x}>{x}</option>)}</select><button className="reset-filter" onClick={() => {setQuery('');setCategory('');setDepartment('');}}>Đặt lại</button></div>{selected.length > 0 && <div className="bulk-toolbar"><span><b>{selected.length}</b> biểu mẫu đã chọn</span><button className="bulk-delete" onClick={() => {setForms(value => value.filter(item => !selected.includes(item.code)));setSelected([]);}}><Trash2 size={15}/> Xóa đã chọn</button></div>}<div className="procedures-table-card"><div className="table-toolbar"><span>Danh sách biểu mẫu <b>{filtered.length}</b></span><small>Hiển thị 1-{filtered.length} trong tổng số {forms.length} biểu mẫu</small></div><div className="admin-table-scroll"><table className="procedures-table forms-table"><thead><tr><th>□</th><th>FILE</th><th>TÊN BIỂU MẪU</th><th>DANH MỤC</th><th>PHÒNG BAN</th><th>PHIÊN BẢN</th><th>ĐỊNH DẠNG</th><th>KÍCH THƯỚC</th><th>LƯỢT TẢI</th><th>CẬP NHẬT</th><th>HÀNH ĐỘNG</th></tr></thead><tbody>{filtered.map(item => <tr key={item.code}><td><input type="checkbox" checked={selected.includes(item.code)} onChange={() => toggle(item.code)}/></td><td><span className={`file-type ${item.type.toLowerCase()}`}><FileText size={17}/></span></td><td><strong className="procedure-name">{item.name}</strong><small className="table-dept-full">{item.code}</small></td><td><span className="audience-tag">{item.category}</span></td><td>{item.dept}</td><td><b className="version-badge">{item.version}</b></td><td><b className={`format-badge ${item.type.toLowerCase()}`}>{item.type}</b></td><td>{item.size}</td><td>{item.downloads}</td><td>{item.date}</td><td><div className="row-actions"><button title="Tải xuống"><DownloadIcon /></button><button title="Lịch sử phiên bản" onClick={() => setHistory(item)}><HistoryIcon /></button><button title="Xóa" className="danger-icon" onClick={() => setForms(value => value.filter(row => row.code !== item.code))}><Trash2 size={16}/></button></div></td></tr>)}</tbody></table></div><div className="pagination"><span>Hiển thị <b>1-{filtered.length}</b> trong <b>{forms.length}</b> biểu mẫu</span><div><button className="current-page">1</button><button>2</button><button>3</button><button>›</button></div></div></div></main></section>{uploadOpen && <UploadDialog onClose={() => setUploadOpen(false)} onUpload={items => {setForms(value => [...items, ...value]);setUploadOpen(false);}}/>}{history && <VersionHistory item={history} onClose={() => setHistory(null)}/>}</div>;
+  return <div className="admin-shell"><AdminSideRail active="Biểu mẫu" /><section className="admin-main"><AdminTopbar /><main className="admin-content procedures-admin-content"><div className="admin-page-heading"><div><div className="admin-breadcrumb inner-breadcrumb"><span>Quản lý</span><ArrowRight size={13} /><b>Biểu mẫu</b></div><h1>Quản lý Biểu mẫu</h1><p>Quản lý kho biểu mẫu và tài liệu hành chính của nhà trường.</p></div><button className="admin-primary-btn" onClick={() => setUploadOpen(true)}><UploadCloud size={16} /> Upload biểu mẫu</button></div><div className="procedure-filter-bar"><div className="admin-filter-search"><Search size={16} /><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Tìm theo tên biểu mẫu..." /></div><select value={category} onChange={e => setCategory(e.target.value)}><option value="">Tất cả danh mục</option>{['Nghỉ phép','Lương','HĐLĐ','Tập huấn','Chuyển CT','Đào tạo'].map(x => <option key={x}>{x}</option>)}</select><select value={department} onChange={e => setDepartment(e.target.value)}><option value="">Tất cả phòng ban</option>{['TCCB','KHTC','KHCN','Đào tạo','Văn phòng'].map(x => <option key={x}>{x}</option>)}</select><button className="reset-filter" onClick={() => {setQuery('');setCategory('');setDepartment('');}}>Đặt lại</button></div>{selected.length > 0 && <div className="bulk-toolbar"><span><b>{selected.length}</b> biểu mẫu đã chọn</span><button className="bulk-delete" onClick={() => {setForms(value => value.filter(item => !selected.includes(item.code)));setSelected([]);}}><Trash2 size={15}/> Xóa đã chọn</button></div>}<div className="procedures-table-card"><div className="table-toolbar"><span>Danh sách biểu mẫu <b>{filtered.length}</b></span><small>Hiển thị 1-{filtered.length} trong tổng số {forms.length} biểu mẫu</small></div><div className="admin-table-scroll"><table className="procedures-table forms-table"><thead><tr><th>□</th><th>FILE</th><th>TÊN BIỂU MẪU</th><th>DANH MỤC</th><th>PHÒNG BAN</th><th>PHIÊN BẢN</th><th>ĐỊNH DẠNG</th><th>KÍCH THƯỚC</th><th>LƯỢT TẢI</th><th>CẬP NHẬT</th><th>HÀNH ĐỘNG</th></tr></thead><tbody>{filtered.map(item => <tr key={item.code}><td><input type="checkbox" checked={selected.includes(item.code)} onChange={() => toggle(item.code)}/></td><td><span className={`file-type ${item.type.toLowerCase()}`}><FileText size={17}/></span></td><td><strong className="procedure-name">{item.name}</strong><small className="table-dept-full">{item.code}</small></td><td><span className="audience-tag">{item.category}</span></td><td>{item.dept}</td><td><b className="version-badge">{item.version}</b></td><td><b className={`format-badge ${item.type.toLowerCase()}`}>{item.type}</b></td><td>{item.size}</td><td>{item.downloads}</td><td>{item.date}</td><td><div className="row-actions">  <button title="Tải xuống" onClick={() => downloadDocument(item)}><DownloadIcon /></button><button title="Lịch sử phiên bản" onClick={() => setHistory(item)}><HistoryIcon /></button><button title="Xóa" className="danger-icon" onClick={() => setForms(value => value.filter(row => row.code !== item.code))}><Trash2 size={16}/></button></div></td></tr>)}</tbody></table></div><div className="pagination"><span>Hiển thị <b>1-{filtered.length}</b> trong <b>{forms.length}</b> biểu mẫu</span><div><button className="current-page">1</button><button>2</button><button>3</button><button>›</button></div></div></div></main></section>{uploadOpen && <UploadDialog onClose={() => setUploadOpen(false)} onUpload={items => {setForms(value => [...items, ...value]);setUploadOpen(false);}}/>}{history && <VersionHistory item={history} onClose={() => setHistory(null)}/>}</div>;
 }
 
 const DownloadIcon = () => <span className="inline-icon">↓</span>;
@@ -885,26 +1086,16 @@ function ProcedureEditor({ initial, onClose, onSave }) {
 }
 
 function AdminPanel() {
-  const [collapsed, setCollapsed] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains('dark-mode'));
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 650);
+    const timer = setTimeout(() => setLoading(false), 450);
     return () => clearTimeout(timer);
   }, []);
-  const goPublic = () => {
-    window.history.pushState({}, '', '/');
-    window.dispatchEvent(new PopStateEvent('popstate'));
-  };
-  return <div className={collapsed ? 'admin-shell collapsed' : 'admin-shell'}>
-    <aside className="admin-sidebar">
-      <button className="admin-logo" onClick={goPublic}><span className="brand-mark"><Building2 size={21} /></span><span><b>ĐẠI HỌC THÁI BÌNH</b><small>QUẢN TRỊ HỆ THỐNG</small></span></button>
-      <nav className="admin-nav">{adminMenu.map(group => <div className="admin-nav-group" key={group.section}><small className="admin-section">{group.section}</small>{group.items.map(([label, Icon]) => <button onClick={() => label === 'Thủ tục hành chính' ? adminNavigate('/admin/procedures') : undefined} className={label === 'Dashboard' ? 'admin-nav-item active' : 'admin-nav-item'} key={label} title={label}><Icon size={18} /><span>{label}</span></button>)}</div>)}</nav>
-      <div className="admin-sidebar-bottom"><div className="admin-user"><span className="admin-avatar">AD</span><span><b>Admin</b><small>Quản trị viên</small></span><MoreHorizontal size={16} /></div><button className="logout-btn" onClick={goPublic}><LogOut size={16} /><span>Đăng xuất</span></button><button className="collapse-btn" onClick={() => setCollapsed(!collapsed)}>{collapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}<span>{collapsed ? 'Mở rộng menu' : 'Thu gọn menu'}</span></button></div>
-    </aside>
+  return <div className="admin-shell">
+    <AdminSideRail active="Dashboard" />
     <section className="admin-main">
-      <header className="admin-topbar"><div className="admin-breadcrumb"><span>Trang quản trị</span><ArrowRight size={13} /><b>Dashboard</b></div><div className="admin-top-actions"><button className="admin-search" aria-label="Tìm kiếm"><Search size={17} /><span>Tìm kiếm...</span><kbd>⌘ K</kbd></button><button className="theme-toggle" aria-label={darkMode ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối'} onClick={() => { const next = !darkMode; setDarkMode(next); document.documentElement.classList.toggle('dark-mode', next); localStorage.setItem('tbu-theme', next ? 'dark' : 'light'); }}>{darkMode ? '☀' : '◐'}</button><NotificationButton audience="admin" /><div className="admin-top-user"><span className="admin-avatar">AD</span><span><b>Admin</b><small>Quản trị viên</small></span><ChevronDown size={14} /></div></div></header>
-      <main className="admin-content"><div className="admin-welcome"><div><h1>Xin chào, Admin! <span>👋</span></h1><p>Chúc bạn một ngày làm việc hiệu quả. Dưới đây là tổng quan hệ thống hôm nay.</p></div><span className="admin-date">Thứ Bảy, 10 tháng 10, 2026</span></div>
+      <AdminTopbar title="Dashboard" />
+      <main className="admin-content"><div className="admin-welcome"><div><h1>Xin chào, Quản trị viên! <span>👋</span></h1><p>Chúc bạn một ngày làm việc hiệu quả. Dưới đây là tổng quan hệ thống hôm nay.</p></div><span className="admin-date">Hôm nay, {new Date().toLocaleDateString('vi-VN')}</span></div>
         {loading ? <AdminSkeleton /> : <><div className="kpi-grid">{[
           ['Tổng hồ sơ tháng này','156','+12% ↑ so với tháng trước',FolderOpen,'blue'],
           ['Đang xử lý','23','Cần xử lý: 5 quá hạn',Clock3,'amber'],
@@ -912,8 +1103,8 @@ function AdminPanel() {
           ['Câu hỏi AI hôm nay','89','Độ hài lòng: 94%',Bot,'purple']
         ].map(([label,value,trend,Icon,color]) => <div className="kpi-card" key={label}><div className={`kpi-icon ${color}`}><Icon size={20} /></div><div className="kpi-copy"><small>{label}</small><strong>{value}</strong><span className={color === 'amber' ? 'warning-text' : 'trend-text'}>{color === 'amber' && <AlertCircle size={12} />}{trend}</span></div><TrendingUp className="kpi-trend" size={17} /></div>)}</div>
         <div className="admin-chart-grid"><AdminChartCard title="Hồ sơ theo tháng" action="12 tháng"><ResponsiveContainer width="100%" height={235}><LineChart data={monthlyApplications}><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#edf1f7" /><XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize:10, fill:'#8290a5'}} /><YAxis axisLine={false} tickLine={false} tick={{fontSize:10, fill:'#8290a5'}} /><Tooltip contentStyle={{border:'0', borderRadius:8, fontSize:11, boxShadow:'0 5px 20px #173c9120'}} /><Line type="monotone" dataKey="value" stroke="#245dcc" strokeWidth={3} dot={{r:3, fill:'#245dcc', strokeWidth:2, stroke:'#fff'}} activeDot={{r:5}} /></LineChart></ResponsiveContainer></AdminChartCard><AdminChartCard title="Phân bố theo phòng ban"><div className="donut-wrap"><ResponsiveContainer width="58%" height={215}><PieChart><Pie data={departmentsData} dataKey="value" innerRadius={61} outerRadius={82} paddingAngle={3}>{departmentsData.map(item => <Cell key={item.name} fill={item.color} />)}</Pie><Tooltip contentStyle={{border:'0',borderRadius:8,fontSize:11}} /></PieChart></ResponsiveContainer><div className="donut-legend">{departmentsData.map(item => <div key={item.name}><i style={{background:item.color}} /><span>{item.name}</span><b>{item.value}%</b></div>)}</div></div></AdminChartCard></div>
-        <div className="admin-lower-grid"><div className="admin-table-card"><div className="card-title-row"><div><h2>Hồ sơ cần xử lý</h2><p>Các hồ sơ đang chờ bạn kiểm tra</p></div><button className="view-all">Xem tất cả <ArrowRight size={14} /></button></div><div className="admin-table-scroll"><table><thead><tr><th>MÃ HS</th><th>NGƯỜI NỘP</th><th>THỦ TỤC</th><th>NGÀY NỘP</th><th>TRẠNG THÁI</th><th /></tr></thead><tbody>{pendingApplications.map(row => <tr key={row[0]}><td><b>{row[0]}</b></td><td>{row[1]}</td><td>{row[2]}</td><td>{row[3]}</td><td><span className={`admin-status ${row[4] === 'Quá hạn' ? 'late' : row[4] === 'Chờ bổ sung' ? 'waiting' : 'processing'}`}>{row[4]}</span></td><td><button className="table-action">Xem</button></td></tr>)}</tbody></table></div></div><div className="chat-activity-card"><div className="card-title-row"><div><h2>Hoạt động Chatbot</h2><p>Tình hình tương tác hôm nay</p></div><Bot size={20} color="#7254c8" /></div><div className="chat-mini-stats"><div><strong>89</strong><span>Tổng câu hỏi</span><em>+18% hôm qua</em></div><div><strong>12</strong><span>Chưa trả lời được</span><em className="orange">Cần bổ sung</em></div></div><h4>Chủ đề phổ biến</h4><div className="topic-tags"><span>Thủ tục sinh viên <b>32</b></span><span>Biểu mẫu <b>24</b></span><span>Tra cứu hồ sơ <b>18</b></span><span>Học phí <b>15</b></span></div><div className="chat-activity-footer"><span><i /> AI đang hoạt động tốt</span><button>Xem báo cáo <ArrowRight size={13} /></button></div></div></div>
-        <AdminChartCard title="Thủ tục phổ biến nhất" action="Xem chi tiết"><ResponsiveContainer width="100%" height={230}><BarChart data={popularProcedures} layout="vertical" margin={{left:20,right:20}}><CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#edf1f7" /><XAxis type="number" axisLine={false} tickLine={false} tick={{fontSize:10,fill:'#8290a5'}} /><YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fontSize:10,fill:'#62718a'}} width={100} /><Tooltip contentStyle={{border:'0',borderRadius:8,fontSize:11}} /><Bar dataKey="value" fill="#3b73d8" radius={[0,5,5,0]} barSize={18} /></BarChart></ResponsiveContainer></AdminChartCard></>}</main>
+        <div className="admin-lower-grid"><div className="admin-table-card"><div className="card-title-row"><div><h2>Hồ sơ cần xử lý</h2><p>Các hồ sơ đang chờ bạn kiểm tra</p></div><button className="view-all" onClick={() => adminNavigate('/admin/applications')}>Xem tất cả <ArrowRight size={14} /></button></div><div className="admin-table-scroll"><table><thead><tr><th>MÃ HS</th><th>NGƯỜI NỘP</th><th>THỦ TỤC</th><th>NGÀY NỘP</th><th>TRẠNG THÁI</th><th /></tr></thead><tbody>{pendingApplications.map(row => <tr key={row[0]}><td><b>{row[0]}</b></td><td>{row[1]}</td><td>{row[2]}</td><td>{row[3]}</td><td><span className={`admin-status ${row[4] === 'Quá hạn' ? 'late' : row[4] === 'Chờ bổ sung' ? 'waiting' : 'processing'}`}>{row[4]}</span></td><td><button className="table-action" onClick={() => adminNavigate(`/admin/applications?code=${row[0]}`)}>Xem</button></td></tr>)}</tbody></table></div></div><div className="chat-activity-card"><div className="card-title-row"><div><h2>Hoạt động Chatbot</h2><p>Tình hình tương tác hôm nay</p></div><Bot size={20} color="#7254c8" /></div><div className="chat-mini-stats"><div><strong>89</strong><span>Tổng câu hỏi</span><em>+18% hôm qua</em></div><div><strong>12</strong><span>Chưa trả lời được</span><em className="orange">Cần bổ sung</em></div></div><h4>Chủ đề phổ biến</h4><div className="topic-tags"><span>Thủ tục sinh viên <b>32</b></span><span>Biểu mẫu <b>24</b></span><span>Tra cứu hồ sơ <b>18</b></span><span>Học phí <b>15</b></span></div><div className="chat-activity-footer"><span><i /> AI đang hoạt động tốt</span><button onClick={() => adminNavigate('/admin/reports')}>Xem báo cáo <ArrowRight size={13} /></button></div></div></div>
+        <AdminChartCard title="Thủ tục phổ biến nhất" action={<span style={{cursor:'pointer',fontSize:'12px',color:'#245dcc'}} onClick={() => adminNavigate('/admin/procedures')}>Xem chi tiết →</span>}><ResponsiveContainer width="100%" height={230}><BarChart data={popularProcedures} layout="vertical" margin={{left:20,right:20}}><CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#edf1f7" /><XAxis type="number" axisLine={false} tickLine={false} tick={{fontSize:10,fill:'#8290a5'}} /><YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fontSize:10,fill:'#62718a'}} width={100} /><Tooltip contentStyle={{border:'0',borderRadius:8,fontSize:11}} /><Bar dataKey="value" fill="#3b73d8" radius={[0,5,5,0]} barSize={18} /></BarChart></ResponsiveContainer></AdminChartCard></>}</main>
     </section>
   </div>;
 }
@@ -976,14 +1167,14 @@ function AdminSkeleton() {
   return <><div className="kpi-grid">{[1,2,3,4].map(i => <div className="skeleton-card" key={i}><span /><div><i /><i /><i /></div></div>)}</div><div className="admin-chart-grid"><div className="admin-card skeleton-chart" /><div className="admin-card skeleton-chart" /></div><div className="admin-lower-grid"><div className="admin-card skeleton-table" /><div className="admin-card skeleton-table" /></div></>;
 }
 
-function Home({ navigate }) {
+function Home({ navigate, onOpenChat }) {
   return <div className="home">
     <section className="hero"><div className="hero-inner"><div className="hero-copy"><div className="eyebrow"><Sparkles size={15} /> DỊCH VỤ HÀNH CHÍNH TRỰC TUYẾN</div><h1>Một cửa<br /><em>một trải nghiệm</em></h1><p>Giải quyết thủ tục hành chính nhanh chóng, minh bạch và thuận tiện — ở bất cứ đâu.</p><div className="hero-buttons"><button className="primary-btn" onClick={() => navigate('procedures')}>Tra cứu thủ tục <ArrowRight size={17} /></button><button className="ghost-btn" onClick={() => navigate('apply')}>Nộp hồ sơ online</button></div><div className="hero-trust"><span><Check size={14} /> Quy trình minh bạch</span><span><Check size={14} /> Theo dõi 24/7</span></div></div><div className="hero-visual"><div className="visual-card"><div className="visual-top"><span className="dot red" /><span className="dot yellow" /><span className="dot green" /><small>Cổng Một cửa điện tử</small></div><div className="visual-content"><div className="visual-title"><span className="mini-logo"><Building2 size={17} /></span><span><b>Hồ sơ của tôi</b><small>Cập nhật lúc 10:24</small></span><span className="status-chip">Đang xử lý</span></div><div className="progress-line"><span /><span /><span /><span /><span /></div><div className="visual-rows"><div><FileText size={19} /><span>Đăng ký xác nhận sinh viên<small>HS-2026-001234</small></span><strong>65%</strong></div><div><ShieldCheck size={19} /><span>Cấp lại thẻ sinh viên<small>HS-2026-001198</small></span><strong className="done">100%</strong></div></div></div></div><div className="float-card"><span className="float-icon"><Zap size={18} /></span><span><b>Tiết kiệm thời gian</b><small>Không cần xếp hàng</small></span></div></div></div></section>
-    <section className="section quick-section"><div className="section-heading"><div><span className="label">BẮT ĐẦU NGAY</span><h2>Mọi điều bạn cần, <span>ngay trong tầm tay</span></h2></div><p>Trải nghiệm dịch vụ hành chính hiện đại, chủ động và thuận tiện.</p></div><div className="quick-grid">{[{icon: Search, title: 'Tra cứu thủ tục', text: 'Tìm kiếm và xem hướng dẫn thủ tục hành chính', page:'procedures'}, {icon: FileText, title: 'Nộp hồ sơ', text: 'Nộp hồ sơ trực tuyến nhanh chóng', page:'apply'}, {icon: Clock3, title: 'Theo dõi hồ sơ', text: 'Kiểm tra tiến độ xử lý hồ sơ', page:'track'}, {icon: Bot, title: 'Hỏi AI', text: 'Trò chuyện với trợ lý AI thông minh'}].map((item) => <button className="quick-card" key={item.title} onClick={() => item.page && navigate(item.page)}><span className="quick-icon"><item.icon size={22} /></span><span><b>{item.title}</b><small>{item.text}</small></span><ArrowRight size={17} /></button>)}</div></section>
+    <section className="section quick-section"><div className="section-heading"><div><span className="label">BẮT ĐẦU NGAY</span><h2>Mọi điều bạn cần, <span>ngay trong tầm tay</span></h2></div><p>Trải nghiệm dịch vụ hành chính hiện đại, chủ động và thuận tiện.</p></div><div className="quick-grid">{[{icon: Search, title: 'Tra cứu thủ tục', text: 'Tìm kiếm và xem hướng dẫn thủ tục hành chính', page:'procedures'}, {icon: FileText, title: 'Nộp hồ sơ', text: 'Nộp hồ sơ trực tuyến nhanh chóng', page:'apply'}, {icon: Clock3, title: 'Theo dõi hồ sơ', text: 'Kiểm tra tiến độ xử lý hồ sơ', page:'track'}, {icon: Bot, title: 'Hỏi AI', text: 'Trò chuyện với trợ lý AI thông minh', action: onOpenChat}].map((item) => <button className="quick-card" key={item.title} onClick={() => item.action ? item.action() : item.page && navigate(item.page)}><span className="quick-icon"><item.icon size={22} /></span><span><b>{item.title}</b><small>{item.text}</small></span><ArrowRight size={17} /></button>)}</div></section>
     <section className="section departments"><div className="section-heading centered"><div><span className="label">KHÁM PHÁ DỊCH VỤ</span><h2>Thủ tục theo <span>phòng ban</span></h2></div><button className="text-btn" onClick={() => navigate('procedures')}>Xem tất cả <ArrowRight size={16} /></button></div><div className="dept-grid">{[{icon:Users, name:'Phòng Tổ chức Cán bộ', count:'12 thủ tục'}, {icon:Calculator, name:'Phòng Kế hoạch - Tài chính', count:'8 thủ tục'}, {icon:FlaskConical, name:'Phòng KHCN & HTPT', count:'10 thủ tục'}, {icon:Building2, name:'Văn phòng', count:'7 thủ tục'}, {icon:GraduationCap, name:'Phòng Đào tạo', count:'18 thủ tục'}].map((d) => <div className="dept-card" key={d.name}><span className="dept-icon"><d.icon size={21} /></span><b>{d.name}</b><small>{d.count}</small><button onClick={() => navigate('procedures')}>Xem thủ tục <ArrowRight size={14} /></button></div>)}</div></section>
     <section className="stats"><div className="stats-inner">{[['2,500+','Hồ sơ đã xử lý'],['98%','Tỷ lệ hài lòng'],['3 ngày','Thời gian xử lý TB'],['24/7','Hỗ trợ AI Chatbot']].map(([n,l]) => <div key={l}><strong>{n}</strong><span>{l}</span></div>)}</div></section>
     <section className="section news-section"><div className="section-heading centered"><div><span className="label">CẬP NHẬT MỚI NHẤT</span><h2>Tin tức & <span>thông báo</span></h2></div><button className="text-btn" onClick={() => navigate('news')}>Xem tất cả <ArrowRight size={16} /></button></div><div className="news-grid">{news.map((item, i) => <article className="news-card" key={item.title}><div className={`news-image img-${i}`}><span>{i === 0 ? 'MỘT CỬA' : 'THÔNG BÁO'}</span></div><div className="news-body"><small>{item.date}</small><h3>{item.title}</h3><p>{item.text}</p><button className="text-btn">Xem thêm <ArrowRight size={14} /></button></div></article>)}</div></section>
-    <section className="cta"><div><span className="label light">LUÔN SẴN SÀNG HỖ TRỢ</span><h2>Bạn cần hỗ trợ?</h2><p>Trợ lý AI của chúng tôi luôn sẵn sàng giải đáp mọi thắc mắc của bạn.</p></div><button className="white-btn">Chat với AI ngay <MessageCircle size={17} /></button></section>
+    <section className="cta"><div><span className="label light">LUÔN SẴN SÀNG HỖ TRỢ</span><h2>Bạn cần hỗ trợ?</h2><p>Trợ lý AI của chúng tôi luôn sẵn sàng giải đáp mọi thắc mắc của bạn.</p></div><button className="white-btn" onClick={onOpenChat}>Chat với AI ngay <MessageCircle size={17} /></button></section>
   </div>;
 }
 
@@ -992,43 +1183,585 @@ function PageHeader({ eyebrow, title, desc }) { return <section className="page-
 function Procedures({ navigate }) {
   const { procedures: sharedProcedures } = useDataStore();
   const [query, setQuery] = useState('');
-  const filtered = sharedProcedures.map(publicProcedure).filter((p) => p.title.toLowerCase().includes(query.toLowerCase()));
-  return <><PageHeader eyebrow="DANH MỤC DỊCH VỤ" title="Thủ tục hành chính" desc="Tìm kiếm và thực hiện thủ tục trực tuyến một cách đơn giản, minh bạch." /><section className="container content-section"><div className="breadcrumb">Trang chủ <ArrowRight size={13} /> Thủ tục hành chính</div><div className="toolbar"><div className="search-box"><Search size={18} /><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Tìm kiếm thủ tục..." /></div><button className="filter-btn"><span>Lọc theo phòng ban</span><ChevronDown size={16} /></button></div><div className="procedure-layout"><aside className="filter-panel"><b>Bộ lọc</b><label className="filter-label">Đối tượng</label>{['Sinh viên','Cán bộ / Giảng viên','Tất cả'].map(x => <label className="check-label" key={x}><input type="checkbox" /> {x}<span /></label>)}<label className="filter-label">Phòng ban</label>{['Phòng Đào tạo','Phòng Tổ chức Cán bộ','Phòng Kế hoạch - Tài chính','Văn phòng'].map(x => <label className="check-label" key={x}><input type="checkbox" /> {x}<span /></label>)}<button className="clear-btn">Xóa bộ lọc</button></aside><div className="procedure-results"><div className="result-head"><b>Hiển thị {filtered.length + 39} thủ tục</b><button>Sắp xếp: <strong>Mới nhất</strong> <ChevronDown size={14} /></button></div><div className="procedure-grid">{filtered.map((p) => <article className="procedure-card" key={p.title}><div className="procedure-top"><span className="procedure-icon"><p.icon size={21} /></span><span className="tag">{p.audience}</span></div><small className="dept-name">{p.dept}</small><h3>{p.title}</h3><p>Hướng dẫn chi tiết các bước thực hiện và hồ sơ cần chuẩn bị.</p><div className="card-bottom"><span><Clock3 size={14} /> {p.time}</span><button onClick={() => navigate(`procedures/${p.id}`)}>Xem chi tiết <ArrowRight size={14} /></button></div></article>)}</div></div></div></section></>;
+  const [selectedAudiences, setSelectedAudiences] = useState([]);
+  const [selectedDepts, setSelectedDepts] = useState([]);
+  const [sortBy, setSortBy] = useState('newest');
+
+  const toggleAudience = (aud) => {
+    setSelectedAudiences(prev => prev.includes(aud) ? prev.filter(a => a !== aud) : [...prev, aud]);
+  };
+
+  const toggleDept = (dept) => {
+    setSelectedDepts(prev => prev.includes(dept) ? prev.filter(d => d !== dept) : [...prev, dept]);
+  };
+
+  const clearFilters = () => {
+    setQuery('');
+    setSelectedAudiences([]);
+    setSelectedDepts([]);
+    setSortBy('newest');
+  };
+
+  const filtered = sharedProcedures
+    .map(publicProcedure)
+    .filter(p => {
+      const matchQuery = !query || p.title.toLowerCase().includes(query.toLowerCase()) || p.code.toLowerCase().includes(query.toLowerCase());
+      const matchAudience = selectedAudiences.length === 0 || selectedAudiences.includes('Tất cả') || selectedAudiences.some(a => p.audience.includes(a));
+      const matchDept = selectedDepts.length === 0 || selectedDepts.includes(p.dept);
+      return matchQuery && matchAudience && matchDept;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'title') return a.title.localeCompare(b.title, 'vi');
+      if (sortBy === 'dept') return a.dept.localeCompare(b.dept, 'vi');
+      return 0; // 'newest' giữ nguyên thứ tự ban đầu
+    });
+
+  return <>
+    <PageHeader eyebrow="DANH MỤC DỊCH VỤ" title="Thủ tục hành chính" desc="Tìm kiếm và thực hiện thủ tục trực tuyến một cách đơn giản, minh bạch." />
+    <section className="container content-section">
+      <div className="breadcrumb">Trang chủ <ArrowRight size={13} /> Thủ tục hành chính</div>
+      <div className="toolbar">
+        <div className="search-box">
+          <Search size={18} />
+          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Tìm kiếm thủ tục..." />
+        </div>
+        <select className="filter-btn" value={selectedDepts[0] || ''} onChange={e => setSelectedDepts(e.target.value ? [e.target.value] : [])} style={{background:'#fff',border:'1px solid #dbe2ea',borderRadius:10,padding:'10px 14px',fontSize:14,cursor:'pointer'}}>
+          <option value="">Lọc theo phòng ban</option>
+          {['Phòng Đào tạo','Phòng Tổ chức Cán bộ','Phòng Kế hoạch - Tài chính','Văn phòng'].map(x => <option key={x} value={x}>{x}</option>)}
+        </select>
+      </div>
+      <div className="procedure-layout">
+        <aside className="filter-panel">
+          <b>Bộ lọc</b>
+          <label className="filter-label">Đối tượng</label>
+          {['Sinh viên','Cán bộ / Giảng viên','Tất cả'].map(x => (
+            <label className="check-label" key={x}>
+              <input type="checkbox" checked={selectedAudiences.includes(x)} onChange={() => toggleAudience(x)} /> {x}
+              <span />
+            </label>
+          ))}
+          <label className="filter-label">Phòng ban</label>
+          {['Phòng Đào tạo','Phòng Tổ chức Cán bộ','Phòng Kế hoạch - Tài chính','Văn phòng'].map(x => (
+            <label className="check-label" key={x}>
+              <input type="checkbox" checked={selectedDepts.includes(x)} onChange={() => toggleDept(x)} /> {x}
+              <span />
+            </label>
+          ))}
+          <button className="clear-btn" onClick={clearFilters}>Xóa bộ lọc</button>
+        </aside>
+        <div className="procedure-results">
+          <div className="result-head">
+            <b>Hiển thị {filtered.length} thủ tục</b>
+            <div style={{display:'flex',alignItems:'center',gap:6}}>
+              <span style={{fontSize:13,color:'#62718a'}}>Sắp xếp:</span>
+              <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{border:'1px solid #dbe2ea',borderRadius:6,padding:'4px 8px',fontSize:13,background:'#fff',cursor:'pointer'}}>
+                <option value="newest">Mới nhất</option>
+                <option value="title">Tên thủ tục (A-Z)</option>
+                <option value="dept">Theo đơn vị</option>
+              </select>
+            </div>
+          </div>
+          <div className="procedure-grid">
+            {filtered.length > 0 ? filtered.map((p) => (
+              <article className="procedure-card" key={p.title}>
+                <div className="procedure-top">
+                  <span className="procedure-icon"><p.icon size={21} /></span>
+                  <span className="tag">{p.audience}</span>
+                </div>
+                <small className="dept-name">{p.dept}</small>
+                <h3>{p.title}</h3>
+                <p>Hướng dẫn chi tiết các bước thực hiện và hồ sơ cần chuẩn bị.</p>
+                <div className="card-bottom">
+                  <span><Clock3 size={14} /> {p.time}</span>
+                  <button onClick={() => navigate(`procedures/${p.id}`)}>Xem chi tiết <ArrowRight size={14} /></button>
+                </div>
+              </article>
+            )) : (
+              <div style={{gridColumn:'1 / -1',padding:40,textAlign:'center',color:'#718096'}}>
+                <p>Không tìm thấy thủ tục nào phù hợp với bộ lọc hiện tại.</p>
+                <button className="primary-btn" onClick={clearFilters} style={{marginTop:12}}>Đặt lại bộ lọc</button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  </>;
 }
 
 function ProcedureDetail({ procedure, navigate, onAsk }) {
   const [tab, setTab] = useState('steps');
-  return <><PageHeader eyebrow="CHI TIẾT THỦ TỤC" title={procedure.title} desc="Thông tin đầy đủ, minh bạch về quy trình và thành phần hồ sơ." /><section className="container procedure-detail-page"><div className="breadcrumb">Trang chủ <ArrowRight size={13}/> Thủ tục hành chính <ArrowRight size={13}/> {procedure.title}</div><div className="procedure-detail-heading"><div><span className="procedure-code-badge">{procedure.code}</span><h1>{procedure.title}</h1></div><span className="detail-audience">{procedure.audience}</span></div><div className="procedure-facts">{[['ĐƠN VỊ CHỦ QUẢN',procedure.dept],['THỜI HẠN GIẢI QUYẾT',procedure.time],['LỆ PHÍ',procedure.fee],['ĐỐI TƯỢNG ÁP DỤNG',procedure.audience],['HÌNH THỨC TIẾP NHẬN',procedure.intake]].map(([label,value])=><div key={label}><small>{label}</small><b>{value}</b></div>)}</div><div className="procedure-detail-layout"><main className="procedure-detail-main"><div className="detail-tabs">{[['steps','Trình tự thực hiện'],['documents','Hồ sơ yêu cầu'],['forms','Biểu mẫu đính kèm'],['legal','Căn cứ pháp lý & FAQ']].map(([id,label])=><button className={tab===id?'active':''} onClick={()=>setTab(id)} key={id}>{label}</button>)}</div>{tab==='steps'&&<div className="detail-stepper">{procedure.steps.map((step,index)=><div className="detail-step" key={step[0]}><span className="step-number">{index+1}</span><div><h3>{step[0]}</h3><div className="step-meta"><span>{step[1]}</span><span>Thời gian tối đa: {step[2]}</span></div><p>{step[3]}</p><small><FileText size={14}/> Biểu mẫu: {step[4]}</small></div></div>)}</div>}{tab==='documents'&&<div className="detail-table-wrap"><table className="detail-doc-table"><thead><tr><th>Tên giấy tờ</th><th>Bản chính</th><th>Bản sao</th><th>Ghi chú chuẩn bị</th><th></th></tr></thead><tbody>{procedure.documents.map(doc=><tr key={doc[0]}><td><b>{doc[0]}</b></td><td>{doc[1]}</td><td>{doc[2]}</td><td>{doc[3]}</td><td>{doc[4]&&<button className="detail-link"><Download size={14}/> Tải mẫu</button>}</td></tr>)}</tbody></table></div>}{tab==='forms'&&<div className="detail-forms-grid">{procedure.forms.map(form=><div className="attached-form-card" key={form[0]}><span className={form[1]==='PDF'?'form-file-icon pdf':'form-file-icon'}><FileText size={23}/></span><div><b>{form[0]}</b><small>{form[1]} · {form[2]}</small></div><div className="attached-actions"><button title="Xem trước"><Eye size={16}/></button><button title="Tải về"><Download size={16}/></button></div></div>)}</div>}{tab==='legal'&&<div className="legal-faq"><h3>Văn bản, quyết định liên quan</h3><ul>{procedure.legal.map(item=><li key={item}><ShieldCheck size={16}/>{item}</li>)}</ul><h3>Câu hỏi thường gặp</h3>{procedure.faqs.map((faq,index)=><details key={faq[0]} open={index===0}><summary>{faq[0]}<ChevronDown size={16}/></summary><p>{faq[1]}</p></details>)}</div>}</main><aside className="detail-action-panel"><h3>Thực hiện thủ tục</h3><p>Bạn đã sẵn sàng? Hãy bắt đầu hồ sơ trực tuyến ngay hôm nay.</p><button className="primary-btn" onClick={()=>navigate(`apply?procedure=${procedure.id}`)}><FileText size={16}/> Nộp hồ sơ trực tuyến</button><button className="outline-btn"><Download size={16}/> Tải toàn bộ biểu mẫu</button><button className="ask-ai-btn" onClick={()=>onAsk(procedure)}><Bot size={16}/> Hỏi AI về thủ tục này</button></aside></div></section></>;
+  return <><PageHeader eyebrow="CHI TIẾT THỦ TỤC" title={procedure.title} desc="Thông tin đầy đủ, minh bạch về quy trình và thành phần hồ sơ." /><section className="container procedure-detail-page"><div className="breadcrumb">Trang chủ <ArrowRight size={13}/> Thủ tục hành chính <ArrowRight size={13}/> {procedure.title}</div><div className="procedure-detail-heading"><div><span className="procedure-code-badge">{procedure.code}</span><h1>{procedure.title}</h1></div><span className="detail-audience">{procedure.audience}</span></div><div className="procedure-facts">{[['ĐƠN VỊ CHỦ QUẢN',procedure.dept],['THỜI HẠN GIẢI QUYẾT',procedure.time],['LỆ PHÍ',procedure.fee],['ĐỐI TƯỢNG ÁP DỤNG',procedure.audience],['HÌNH THỨC TIẾP NHẬN',procedure.intake]].map(([label,value])=><div key={label}><small>{label}</small><b>{value}</b></div>)}</div><div className="procedure-detail-layout"><main className="procedure-detail-main"><div className="detail-tabs">{[['steps','Trình tự thực hiện'],['documents','Hồ sơ yêu cầu'],['forms','Biểu mẫu đính kèm'],['legal','Căn cứ pháp lý & FAQ']].map(([id,label])=><button className={tab===id?'active':''} onClick={()=>setTab(id)} key={id}>{label}</button>)}</div>{tab==='steps'&&<div className="detail-stepper">{procedure.steps.map((step,index)=><div className="detail-step" key={step[0]}><span className="step-number">{index+1}</span><div><h3>{step[0]}</h3><div className="step-meta"><span>{step[1]}</span><span>Thời gian tối đa: {step[2]}</span></div><p>{step[3]}</p><small><FileText size={14}/> Biểu mẫu: {step[4]}</small></div></div>)}</div>}{tab==='documents'&&<div className="detail-table-wrap"><table className="detail-doc-table"><thead><tr><th>Tên giấy tờ</th><th>Bản chính</th><th>Bản sao</th><th>Ghi chú chuẩn bị</th><th></th></tr></thead><tbody>{procedure.documents.map(doc=><tr key={doc[0]}><td><b>{doc[0]}</b></td><td>{doc[1]}</td><td>{doc[2]}</td><td>{doc[3]}</td><td>{doc[4]&&<button className="detail-link" onClick={() => downloadSampleFile(`${doc[0]}.doc`, procedure.title)}><Download size={14}/> Tải mẫu</button>}</td></tr>)}</tbody></table></div>  }{tab==='forms'&&<div className="detail-forms-grid">{procedure.attachedDocuments?.length ? procedure.attachedDocuments.map(document=><div className="attached-form-card" key={document.code}><span className={document.type==='PDF'?'form-file-icon pdf':'form-file-icon'}><FileText size={23}/></span><div><b>{document.name}</b><small>{document.type} · {document.size} · {document.role === 'FORM' ? 'Biểu mẫu' : 'Tài liệu liên quan'}</small></div><div className="attached-actions"><button title="Mở tài liệu" onClick={() => downloadDocument(document)}><Eye size={16}/></button><button title="Tải về" onClick={() => downloadDocument(document)}><Download size={16}/></button></div></div>) : <div className="empty-state"><p>Chưa có tài liệu được đối chiếu chắc chắn với thủ tục này.</p><small>Vui lòng liên hệ Bộ phận Một cửa để được cung cấp đúng biểu mẫu.</small></div>}</div>}{tab==='legal'&&<div className="legal-faq"><h3>Văn bản, quyết định liên quan</h3><ul>{procedure.legal.map(item=><li key={item}><ShieldCheck size={16}/>{item}</li>)}</ul><h3>Câu hỏi thường gặp</h3>{procedure.faqs.map((faq,index)=><details key={faq[0]} open={index===0}><summary>{faq[0]}<ChevronDown size={16}/></summary><p>{faq[1]}</p></details>)}</div>}</main><aside className="detail-action-panel"><h3>Thực hiện thủ tục</h3><p>Bạn đã sẵn sàng? Hãy bắt đầu hồ sơ trực tuyến ngay hôm nay.</p><button className="primary-btn" onClick={()=>navigate(`apply?procedure=${procedure.id}`)}><FileText size={16}/> Nộp hồ sơ trực tuyến</button><button className="outline-btn" onClick={() => downloadSampleFile(`${procedure.title}-bieu-mau.zip`, procedure.title)}><Download size={16}/> Tải toàn bộ biểu mẫu</button><button className="ask-ai-btn" onClick={()=>onAsk(procedure)}><Bot size={16}/> Hỏi AI về thủ tục này</button></aside></div></section></>;
 }
 
 function Forms() {
   const { forms } = useDataStore();
-  return <><PageHeader eyebrow="TÀI NGUYÊN & BIỂU MẪU" title="Tải biểu mẫu" desc="Tải xuống các biểu mẫu hành chính mới nhất của Trường Đại học Thái Bình." /><section className="container content-section"><div className="tabs">{['Tất cả','Nghỉ phép & Thai sản','Lương & Phụ cấp','Hợp đồng lao động','Đào tạo'].map((x,i) => <button className={i===0?'selected':''} key={x}>{x}</button>)}</div><div className="form-list">{forms.map((form,i) => <div className="form-row" key={form.code || form.name}><span className={i % 2 ? 'file-icon doc' : 'file-icon pdf'}><FileText size={21} /></span><div><b>{form.name}</b><small>Biểu mẫu hành chính · Cập nhật {form.date || '10/2026'}</small></div><span className="format">{form.type || 'PDF'} · {form.size || '1.2 MB'}</span><button className="download-btn">Tải xuống <ArrowRight size={15} /></button></div>)}</div></section></>;
+  const [selectedCategory, setSelectedCategory] = useState('Tất cả');
+  const categories = ['Tất cả', ...new Set(forms.map(form => form.category).filter(Boolean))];
+  const filteredForms = forms.filter(f => selectedCategory === 'Tất cả' || f.category === selectedCategory);
+
+  return <><PageHeader eyebrow="TÀI NGUYÊN & BIỂU MẪU" title="Tải biểu mẫu" desc="Tải xuống các biểu mẫu hành chính mới nhất của Trường Đại học Thái Bình." /><section className="container content-section"><div className="tabs">{categories.map(cat => <button className={selectedCategory === cat ? 'selected' : ''} key={cat} onClick={() => setSelectedCategory(cat)}>{cat}</button>)}</div><div className="form-list">{filteredForms.length > 0 ? filteredForms.map((form,i) => <div className="form-row" key={form.code || form.name}><span className={i % 2 ? 'file-icon doc' : 'file-icon pdf'}><FileText size={21} /></span><div><b>{form.name}</b><small>Biểu mẫu hành chính · {form.category} · Cập nhật {form.date || '10/2026'}</small></div><span className="format">{form.type || 'PDF'} · {form.size || '1.2 MB'}</span>  <button className="download-btn" onClick={() => downloadDocument(form)}>Tải xuống <ArrowRight size={15} /></button></div>) : <div style={{padding:32,textAlign:'center',color:'#718096'}}>Không có biểu mẫu nào trong danh mục này.</div>}</div></section></>;
 }
 
 function Apply({ navigate, currentUser }) {
-  const [step, setStep] = useState(1);
   const { procedures: sharedProcedures, setApplications, addNotification } = useDataStore();
-  const selectedId = new URLSearchParams(window.location.search).get('procedure');
-  const selected = sharedProcedures.map(publicProcedure).find(item => item.id === selectedId) || publicProcedure(sharedProcedures[0] || procedures[0]);
-  const submitApplication = () => {
-    const code = `HS-2026-${String(Math.floor(1000 + Math.random() * 9000))}`;
-    const applicant = currentUser?.name || 'Nguyễn Lan Anh';
-    setApplications(value => [{ code, applicant, email: currentUser?.email, procedure: selected.title, procedureId: selected.id, date: new Date().toLocaleDateString('vi-VN'), submittedAt: new Date().toISOString(), priority: 'blue', staff: 'Mới', elapsed: '0 ngày', dept: selected.dept, status: 'Tiếp nhận', files: ['don-de-nghi.pdf'], timeline: [{ status: 'Tiếp nhận', at: new Date().toISOString(), by: 'Hệ thống', note: 'Hồ sơ đã được gửi thành công.' }] }, ...value]);
-    addNotification({ audience: 'admin', type: 'new-application', text: `Có hồ sơ mới từ ${applicant}`, code });
-    navigate('track');
+  const allProcedures = sharedProcedures.map(publicProcedure);
+  const initialProcId = new URLSearchParams(window.location.search).get('procedure') || allProcedures[0]?.id || 'p1';
+  
+  const [step, setStep] = useState(1);
+  const [selectedProcId, setSelectedProcId] = useState(initialProcId);
+  const [procSearch, setProcSearch] = useState('');
+  const [applicantInfo, setApplicantInfo] = useState({
+    fullName: currentUser?.name || 'Nguyễn Lan Anh',
+    code: currentUser?.code || '21D100123',
+    email: currentUser?.email || 'lananh@tbu.edu.vn',
+    phone: currentUser?.phone || '0988 123 456',
+    dept: currentUser?.role === 'staff' ? 'Phòng Tổ chức Cán bộ' : 'Khoa Kinh tế'
+  });
+  const [files, setFiles] = useState([
+    { name: 'don-de-nghi-theo-mau.pdf', size: '245 KB' }
+  ]);
+  const [agreed, setAgreed] = useState(true);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const selected = allProcedures.find(item => item.id === selectedProcId) || allProcedures[0];
+
+  const handleFileUpload = (e) => {
+    const chosenFiles = Array.from(e.target.files || []);
+    if (chosenFiles.length > 0) {
+      const newItems = chosenFiles.map(f => ({
+        name: f.name,
+        size: `${(f.size / (1024 * 1024)).toFixed(1)} MB`,
+        file: f
+      }));
+      setFiles(prev => [...prev, ...newItems]);
+    }
   };
-  return <><PageHeader eyebrow="DỊCH VỤ TRỰC TUYẾN" title="Nộp hồ sơ trực tuyến" desc="Hoàn tất hồ sơ của bạn chỉ với vài bước đơn giản." /><section className="container content-section"><div className="wizard-steps">{['Chọn thủ tục','Thông tin cá nhân','Tải hồ sơ','Xác nhận & gửi'].map((s,i) => <div className={step > i+1 ? 'wizard-step done' : step === i+1 ? 'wizard-step current' : 'wizard-step'} key={s}><span>{step > i+1 ? <Check size={15} /> : i + 1}</span><b>{s}</b></div>)}</div><div className="apply-card">{step===1 && <><h2>Chọn thủ tục bạn muốn thực hiện</h2><p className="muted">Tìm kiếm trong danh mục thủ tục hành chính của trường.</p><div className="selected-procedure"><span className="quick-icon"><selected.icon size={20} /></span><div><small>THỦ TỤC ĐƯỢC CHỌN</small><b>{selected.title}</b><p>{selected.dept} · Thời gian xử lý: {selected.time}</p></div><Check className="selected-check" size={19} /></div></>}{step===2 && <><h2>Thông tin cá nhân</h2><p className="muted">Thông tin được bảo mật và chỉ sử dụng cho hồ sơ này.</p><div className="form-fields"><label>Họ và tên<input value="Nguyễn Lan Anh" readOnly /></label><label>Mã sinh viên / CBGV<input value="21D100123" readOnly /></label><label>Email<input value="lananh@tbu.edu.vn" readOnly /></label><label>Số điện thoại<input value="0988 123 456" readOnly /></label></div></>}{step===3 && <><h2>Tải hồ sơ</h2><p className="muted">Tải lên các tài liệu cần thiết theo yêu cầu của thủ tục.</p><div className="drop-zone"><UploadCloud size={30} /><b>Kéo thả tệp vào đây hoặc <span>chọn tệp</span></b><small>PDF, DOC, DOCX, JPG, PNG · Tối đa 10MB/tệp</small></div></>}{step===4 && <><h2>Xác nhận & gửi hồ sơ</h2><p className="muted">Vui lòng kiểm tra lại thông tin trước khi gửi.</p><div className="confirm-list"><div><span>Thủ tục</span><b>Đăng ký xác nhận sinh viên</b></div><div><span>Người nộp</span><b>Nguyễn Lan Anh · 21D100123</b></div><div><span>Tài liệu</span><b>don-xac-nhan-sinh-vien.pdf</b></div></div><label className="agreement"><input type="checkbox" defaultChecked /> Tôi cam kết các thông tin cung cấp là chính xác.</label></> }<div className="wizard-actions">{step > 1 && <button className="outline-btn" onClick={() => setStep(step - 1)}>Quay lại</button>}  <button className="primary-btn" onClick={() => step < 4 ? setStep(step + 1) : submitApplication()}>{step === 4 ? 'Gửi hồ sơ' : 'Tiếp theo'} <ArrowRight size={16} /></button></div></div></section></>;
+
+  const removeFile = (index) => {
+    setFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const nextStep = () => {
+    setErrorMsg('');
+    if (step === 2) {
+      if (!applicantInfo.fullName.trim() || !applicantInfo.email.trim() || !applicantInfo.phone.trim()) {
+        setErrorMsg('Vui lòng điền đầy đủ Họ tên, Email và Số điện thoại liên hệ.');
+        return;
+      }
+    }
+    if (step === 3 && files.length === 0) {
+      setErrorMsg('Vui lòng đính kèm ít nhất 1 tài liệu hồ sơ theo yêu cầu.');
+      return;
+    }
+    setStep(s => s + 1);
+  };
+
+  const submitApplication = async () => {
+    if (!agreed) {
+      setErrorMsg('Vui lòng tích xác nhận cam kết thông tin trước khi nộp.');
+      return;
+    }
+    if (localStorage.getItem('tbu_token')) {
+      try {
+        const uploadedFiles = await Promise.all(files.map(async file => {
+          if (!file.file) return { name: file.name, size: file.size };
+          return api.uploadFile(file.file);
+        }));
+        const saved = await api.submitApplication({
+          applicant_name: applicantInfo.fullName,
+          applicant_code: applicantInfo.code,
+          email: applicantInfo.email,
+          phone: applicantInfo.phone,
+          dept: selected.dept,
+          procedure_name: selected.title,
+          procedure_code: selected.code,
+          files: uploadedFiles
+        });
+        setApplications(prev => [applicationFromApi(saved), ...prev.filter(item => item.code !== saved.code)]);
+        addNotification({ audience: 'admin', type: 'new-application', text: `Có hồ sơ mới từ ${applicantInfo.fullName} (${selected.title})`, code: saved.code });
+        addNotification({ audience: applicantInfo.email, type: 'application-status', text: `Hồ sơ ${saved.code} của bạn đã được tiếp nhận.`, code: saved.code });
+        navigate(`track?code=${saved.code}`);
+        return;
+      } catch (error) {
+        setErrorMsg(error.message || 'Không thể gửi hồ sơ lên máy chủ.');
+        return;
+      }
+    }
+    const code = `HS-2026-${String(Math.floor(1000 + Math.random() * 9000))}`;
+    const newApp = {
+      code,
+      applicant: applicantInfo.fullName,
+      codeSV: applicantInfo.code,
+      email: applicantInfo.email,
+      phone: applicantInfo.phone,
+      procedure: selected.title,
+      procedureId: selected.id,
+      date: new Date().toLocaleDateString('vi-VN'),
+      submittedAt: new Date().toISOString(),
+      priority: 'blue',
+      staff: 'Mới',
+      elapsed: '0 ngày',
+      dept: selected.dept,
+      status: 'Tiếp nhận',
+      files: files.map(f => f.name),
+      timeline: [
+        { status: 'Tiếp nhận', at: new Date().toISOString(), by: 'Hệ thống Một cửa', note: 'Hồ sơ đã được gửi trực tuyến thành công.' }
+      ]
+    };
+    setApplications(prev => [newApp, ...prev]);
+    addNotification({ audience: 'admin', type: 'new-application', text: `Có hồ sơ mới từ ${applicantInfo.fullName} (${selected.title})`, code });
+    addNotification({ audience: applicantInfo.email, type: 'application-status', text: `Hồ sơ ${code} của bạn đã được tiếp nhận.`, code });
+    navigate(`track?code=${code}`);
+  };
+
+  return <>
+    <PageHeader eyebrow="DỊCH VỤ TRỰC TUYẾN" title="Nộp hồ sơ trực tuyến" desc="Hoàn tất hồ sơ của bạn chỉ với vài bước đơn giản." />
+    <section className="container content-section">
+      <div className="wizard-steps">
+        {['Chọn thủ tục','Thông tin cá nhân','Tải hồ sơ','Xác nhận & gửi'].map((s,i) => (
+          <div className={step > i+1 ? 'wizard-step done' : step === i+1 ? 'wizard-step current' : 'wizard-step'} key={s}>
+            <span>{step > i+1 ? <Check size={15} /> : i + 1}</span>
+            <b>{s}</b>
+          </div>
+        ))}
+      </div>
+      
+      <div className="apply-card">
+        {errorMsg && <div className="auth-alert error" style={{marginBottom:16}}><AlertCircle size={16}/>{errorMsg}</div>}
+        
+        {step === 1 && <>
+          <h2>Chọn thủ tục bạn muốn thực hiện</h2>
+          <p className="muted">Tìm kiếm và chọn thủ tục hành chính bạn cần nộp hồ sơ.</p>
+          <div className="search-box" style={{marginBottom: 16}}>
+            <Search size={18} />
+            <input value={procSearch} onChange={e => setProcSearch(e.target.value)} placeholder="Tìm tên thủ tục..." />
+          </div>
+          <div className="selected-procedure" style={{marginBottom: 20}}>
+            <span className="quick-icon"><selected.icon size={20} /></span>
+            <div>
+              <small>THỦ TỤC ĐƯỢC CHỌN</small>
+              <b>{selected.title}</b>
+              <p>{selected.dept} · Thời gian xử lý: {selected.time} · Lệ phí: {selected.fee || 'Miễn phí'}</p>
+              {documentsForProcedure(selected).length > 0 && <small style={{display:'block',marginTop:6,color:'#245dcc'}}>Tài liệu liên quan: {documentsForProcedure(selected).length} file thật đã được đối chiếu</small>}
+            </div>
+            <Check className="selected-check" size={19} />
+          </div>
+          <div style={{maxHeight: 220, overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: 8, padding: 8}}>
+            <small style={{fontWeight: 600, color: '#718096', display: 'block', marginBottom: 6}}>Danh sách thủ tục có sẵn:</small>
+            {allProcedures.filter(p => !procSearch || p.title.toLowerCase().includes(procSearch.toLowerCase())).map(p => (
+              <div 
+                key={p.id} 
+                onClick={() => setSelectedProcId(p.id)}
+                style={{
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  padding: '8px 12px', 
+                  borderRadius: 6, 
+                  cursor: 'pointer', 
+                  background: p.id === selectedProcId ? '#edf2f7' : 'transparent',
+                  marginBottom: 4
+                }}
+              >
+                <span style={{fontSize: 14, fontWeight: p.id === selectedProcId ? 600 : 400}}>{p.title}</span>
+                <span style={{fontSize: 12, color: '#718096'}}>{p.dept}</span>
+              </div>
+            ))}
+          </div>
+        </>}
+
+        {step === 2 && <>
+          <h2>Thông tin người nộp hồ sơ</h2>
+          <p className="muted">Vui lòng kiểm tra và hoàn thiện thông tin liên hệ chính xác để nhận thông báo kết quả.</p>
+          <div className="form-fields">
+            <label>Họ và tên <em>*</em><input value={applicantInfo.fullName} onChange={e => setApplicantInfo({...applicantInfo, fullName: e.target.value})} placeholder="Nguyễn Văn A" /></label>
+            <label>Mã sinh viên / CBGV<input value={applicantInfo.code} onChange={e => setApplicantInfo({...applicantInfo, code: e.target.value})} placeholder="21D100..." /></label>
+            <label>Email nhận kết quả <em>*</em><input type="email" value={applicantInfo.email} onChange={e => setApplicantInfo({...applicantInfo, email: e.target.value})} placeholder="email@tbu.edu.vn" /></label>
+            <label>Số điện thoại <em>*</em><input value={applicantInfo.phone} onChange={e => setApplicantInfo({...applicantInfo, phone: e.target.value})} placeholder="0988..." /></label>
+            <label style={{gridColumn: '1 / -1'}}>Đơn vị / Khoa<input value={applicantInfo.dept} onChange={e => setApplicantInfo({...applicantInfo, dept: e.target.value})} placeholder="Khoa Kinh tế / Phòng ban..." /></label>
+          </div>
+        </>}
+
+        {step === 3 && <>
+          <h2>Tải hồ sơ đính kèm</h2>
+          <p className="muted">Tải lên các tài liệu cần thiết theo yêu cầu của thủ tục "{selected.title}".</p>
+          <div className="drop-zone" style={{position:'relative', cursor:'pointer'}}>
+            <UploadCloud size={30} />
+            <b>Kéo thả tệp vào đây hoặc <span>chọn tệp</span></b>
+            <small>PDF, DOC, DOCX, JPG, PNG · Tối đa 20MB/tệp</small>
+            <input type="file" multiple onChange={handleFileUpload} style={{position:'absolute',top:0,left:0,width:'100%',height:'100%',opacity:0,cursor:'pointer'}} />
+          </div>
+          {files.length > 0 && <div style={{marginTop: 16}}>
+            <h4 style={{fontSize: 14, marginBottom: 8}}>Tệp đã đính kèm ({files.length}):</h4>
+            {files.map((file, idx) => (
+              <div key={idx} style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'8px 12px', background:'#f8fafc', border:'1px solid #e2e8f0', borderRadius:6, marginBottom:6}}>
+                <div style={{display:'flex', alignItems:'center', gap:8}}>
+                  <FileText size={16} color="#3182ce" />
+                  <span style={{fontSize:13, fontWeight:500}}>{file.name}</span>
+                  <small style={{color:'#718096'}}>({file.size})</small>
+                </div>
+                <button type="button" onClick={() => removeFile(idx)} style={{background:'none', border:'none', cursor:'pointer', color:'#e53e3e'}} title="Xóa tệp"><Trash2 size={15}/></button>
+              </div>
+            ))}
+          </div>}
+        </>}
+
+        {step === 4 && <>
+          <h2>Xác nhận & gửi hồ sơ</h2>
+          <p className="muted">Vui lòng kiểm tra lại toàn bộ thông tin trước khi chính thức gửi hồ sơ.</p>
+          <div className="confirm-list">
+            <div><span>Thủ tục</span><b>{selected.title}</b></div>
+            <div><span>Đơn vị giải quyết</span><b>{selected.dept}</b></div>
+            <div><span>Người nộp</span><b>{applicantInfo.fullName} ({applicantInfo.code || 'Chưa cung cấp'})</b></div>
+            <div><span>Email liên hệ</span><b>{applicantInfo.email}</b></div>
+            <div><span>Số điện thoại</span><b>{applicantInfo.phone}</b></div>
+            <div><span>Tài liệu đính kèm</span><b>{files.map(f => f.name).join(', ') || 'Không có file'}</b></div>
+          </div>
+          <label className="agreement" style={{marginTop: 16, display:'flex', alignItems:'center', gap:8}}>
+            <input type="checkbox" checked={agreed} onChange={e => setAgreed(e.target.checked)} /> 
+            <span>Tôi cam kết các thông tin và tài liệu cung cấp là hoàn toàn chính xác.</span>
+          </label>
+        </>}
+
+        <div className="wizard-actions">
+          {step > 1 && <button className="outline-btn" onClick={() => setStep(step - 1)}>Quay lại</button>}
+          <button className="primary-btn" onClick={step < 4 ? nextStep : submitApplication}>
+            {step === 4 ? 'Gửi hồ sơ' : 'Tiếp theo'} <ArrowRight size={16} />
+          </button>
+        </div>
+      </div>
+    </section>
+  </>;
 }
 
 function Track({ currentUser }) {
   const { applications } = useDataStore();
   const [receipt, setReceipt] = useState(null);
-  const [code, setCode] = useState(new URLSearchParams(window.location.search).get('code') || '');
-  const [searched, setSearched] = useState(new URLSearchParams(window.location.search).get('code') || '');
-  const item = applications.find(application => application.code === searched) || (searched ? null : applications.find(application => currentUser && application.email === currentUser.email) || applications[0]);
-  return <><PageHeader eyebrow="MINH BẠCH & CHỦ ĐỘNG" title="Tra cứu hồ sơ" desc="Theo dõi tiến độ xử lý hồ sơ của bạn ở bất cứ đâu." /><section className="container content-section track-section"><div className="track-search"><div className="search-box"><Search size={18} /><input placeholder="Nhập mã hồ sơ hoặc số CMND/CCCD" value={code} onChange={event => setCode(event.target.value)} /></div><button className="primary-btn" onClick={() => setSearched(code.trim())}>Tra cứu <ArrowRight size={16} /></button></div>{item ? <div className="application-card"><div className="application-head"><div><small>MÃ HỒ SƠ</small><h2>{item.code}</h2><p>{item.procedure}</p></div><span className="status-badge"><i /> {item.status}</span></div><div className="timeline">{(item.timeline || [{ status:'Tiếp nhận', at:item.submittedAt || item.date, by:'Hệ thống', note:'Hồ sơ đã được tiếp nhận.' }]).map((event,index) => <div className="timeline-item done" key={`${event.status}-${event.at}`}><span className="timeline-dot"><Check size={13} /></span><div><b>{event.status}</b><small>{event.at ? new Date(event.at).toLocaleString('vi-VN') : item.date} · {event.by}</small>{event.note && <p>{event.note}</p>}</div></div>)}  </div><button className="primary-btn track-receipt-button" onClick={() => setReceipt(item)}><FileText size={15}/> In phiếu hẹn trả kết quả  </button></div> : searched && <div className="empty-state"><h3>Không tìm thấy hồ sơ</h3><p>Vui lòng kiểm tra lại mã hồ sơ HS-2026-XXXX.</p></div>}  </section>{receipt && <ReceiptModal item={receipt} onClose={() => setReceipt(null)} />}</>; }
-function News() { return <><PageHeader eyebrow="TIN TỨC & THÔNG BÁO" title="Tin tức" desc="Thông tin mới nhất từ Trường Đại học Thái Bình." /><section className="container content-section"><div className="news-grid news-page">{news.concat(news).map((item,i) => <article className="news-card" key={`${item.title}-${i}`}><div className={`news-image img-${i%3}`}><span>{i%2 ? 'THÔNG BÁO' : 'MỘT CỬA'}</span></div><div className="news-body"><small>{item.date}</small><h3>{item.title}</h3><p>{item.text}</p><button className="text-btn">Đọc bài viết <ArrowRight size={14} /></button></div></article>)}</div></section></>; }
-function Profile() { return <><PageHeader eyebrow="TÀI KHOẢN CỦA TÔI" title="Hồ sơ cá nhân" desc="Quản lý thông tin tài khoản và lịch sử hồ sơ của bạn." /><section className="container content-section"><div className="profile-card"><div className="profile-cover"><span className="large-avatar">NL</span><div><h2>Nguyễn Lan Anh</h2><p>Sinh viên · Khoa Kinh tế</p></div><button className="outline-btn">Chỉnh sửa hồ sơ</button></div><div className="profile-tabs"><button className="selected">Thông tin cá nhân</button><button>Đổi mật khẩu</button><button>Thông báo</button><button>Lịch sử hồ sơ</button></div><div className="form-fields profile-fields"><label>Họ và tên<input value="Nguyễn Lan Anh" readOnly /></label><label>Mã sinh viên<input value="21D100123" readOnly /></label><label>Email<input value="lananh@tbu.edu.vn" readOnly /></label><label>Số điện thoại<input value="0988 123 456" readOnly /></label></div></div></section></>; }
+  const [code, setCode] = useState('');
+  const [searched, setSearched] = useState('');
+
+  useEffect(() => {
+    const queryCode = new URLSearchParams(window.location.search).get('code');
+    if (queryCode) {
+      setCode(queryCode);
+      setSearched(queryCode);
+    }
+  }, []);
+
+  const handleSearch = (e) => {
+    e?.preventDefault();
+    setSearched(code.trim());
+  };
+
+  const item = applications.find(application => 
+    (searched && application.code.toLowerCase() === searched.toLowerCase()) ||
+    (searched && application.phone && application.phone.includes(searched)) ||
+    (searched && application.email && application.email.toLowerCase() === searched.toLowerCase()) ||
+    (searched && application.applicant && application.applicant.toLowerCase().includes(searched.toLowerCase()))
+  ) || (!searched ? (applications.find(application => currentUser && application.email === currentUser.email) || applications[0]) : null);
+
+  return <>
+    <PageHeader eyebrow="MINH BẠCH & CHỦ ĐỘNG" title="Tra cứu hồ sơ" desc="Theo dõi tiến độ xử lý hồ sơ của bạn ở bất cứ đâu." />
+    <section className="container content-section track-section">
+      <form className="track-search" onSubmit={handleSearch}>
+        <div className="search-box">
+          <Search size={18} />
+          <input 
+            placeholder="Nhập mã hồ sơ (HS-2026-...), email, họ tên hoặc SĐT..." 
+            value={code} 
+            onChange={event => setCode(event.target.value)} 
+          />
+        </div>
+        <button className="primary-btn" type="submit">Tra cứu <ArrowRight size={16} /></button>
+      </form>
+      
+      {item ? (
+        <div className="application-card">
+          <div className="application-head">
+            <div>
+              <small>MÃ HỒ SƠ</small>
+              <h2>{item.code}</h2>
+              <p><b>{item.procedure}</b> · Người nộp: {item.applicant} ({item.phone || item.email || 'Thông tin Một cửa'})</p>
+            </div>
+            <span className="status-badge"><i /> {item.status}</span>
+          </div>
+          
+          <div className="timeline">
+            {(item.timeline || [{ status:'Tiếp nhận', at:item.submittedAt || item.date, by:'Hệ thống Một cửa', note:'Hồ sơ đã được tiếp nhận.' }]).map((event,index) => (
+              <div className="timeline-item done" key={`${event.status}-${index}`}>
+                <span className="timeline-dot"><Check size={13} /></span>
+                <div>
+                  <b>{event.status}</b>
+                  <small>{event.at ? (event.at.includes('T') ? new Date(event.at).toLocaleString('vi-VN') : event.at) : item.date} · {event.by}</small>
+                  {event.note && <p>{event.note}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{marginTop: 20, display:'flex', gap:10, flexWrap:'wrap'}}>
+            <button className="primary-btn track-receipt-button" onClick={() => setReceipt(item)}>
+              <FileText size={15}/> In phiếu hẹn trả kết quả
+            </button>
+            {item.files?.length > 0 && item.files.map((f, i) => (
+              <button key={i} className="admin-outline-btn" onClick={() => downloadSampleFile(f, item.procedure)}>
+                <Download size={14}/> Tải đính kèm: {f}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : searched ? (
+        <div className="empty-state">
+          <h3>Không tìm thấy hồ sơ</h3>
+          <p>Không tìm thấy hồ sơ nào khớp với từ khóa "{searched}". Vui lòng kiểm tra lại mã hồ sơ hoặc số điện thoại.</p>
+        </div>
+      ) : null}
+    </section>
+    {receipt && <ReceiptModal item={receipt} onClose={() => setReceipt(null)} />}
+  </>;
+}
+
+function News() { const [items,setItems]=useState([]); useEffect(()=>{api.getNews().then(setItems).catch(error=>console.error('Không thể tải tin tức:',error));},[]); return <><PageHeader eyebrow="TIN TỨC & THÔNG BÁO" title="Tin tức" desc="Thông tin mới nhất từ Trường Đại học Thái Bình." /><section className="container content-section"><div className="news-grid news-page">{items.map((item,i) => <article className="news-card" key={item.id || `${item.title}-${i}`}><div className={`news-image img-${i%3}`}><span>{item.category || 'MỘT CỬA'}</span></div><div className="news-body"><small>{item.date || item.published_at}</small><h3>{item.title}</h3><p>{item.summary || item.content || ''}</p><button className="text-btn">Đọc bài viết <ArrowRight size={14} /></button></div></article>)}</div></section></>; }
+
+function Profile({ currentUser, navigate }) {
+  const { applications, notifications, storeUsers, setStoreUsers } = useDataStore();
+  const [tab, setTab] = useState('info');
+  const [currentPass, setCurrentPass] = useState('');
+  const [newPass, setNewPass] = useState('');
+  const [confirmPass, setConfirmPass] = useState('');
+  const [passMsg, setPassMsg] = useState({ text: '', type: '' });
+
+  const user = currentUser || {
+    name: 'Nguyễn Lan Anh',
+    code: '21D100123',
+    email: 'lananh@tbu.edu.vn',
+    role: 'student',
+    dept: 'Khoa Kinh tế',
+    phone: '0988 123 456'
+  };
+
+  const myApplications = applications.filter(a => 
+    (currentUser && a.email && a.email.toLowerCase() === currentUser.email.toLowerCase()) ||
+    (a.applicant && a.applicant.toLowerCase().includes(user.name.toLowerCase()))
+  );
+
+  const handlePasswordChange = (e) => {
+    e.preventDefault();
+    if (!currentPass || !newPass || !confirmPass) {
+      return setPassMsg({ text: 'Vui lòng điền đầy đủ các trường mật khẩu.', type: 'error' });
+    }
+    if (newPass.length < 6) {
+      return setPassMsg({ text: 'Mật khẩu mới phải có tối thiểu 6 ký tự.', type: 'error' });
+    }
+    if (newPass !== confirmPass) {
+      return setPassMsg({ text: 'Mật khẩu xác nhận không khớp.', type: 'error' });
+    }
+    
+    // Cập nhật mật khẩu trong store
+    setStoreUsers(prev => prev.map(u => u.email.toLowerCase() === user.email.toLowerCase() ? { ...u, password: newPass } : u));
+    const currentStorageUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (currentStorageUser.email) {
+      localStorage.setItem('currentUser', JSON.stringify({ ...currentStorageUser, password: newPass }));
+    }
+    setPassMsg({ text: 'Đổi mật khẩu thành công!', type: 'success' });
+    setCurrentPass('');
+    setNewPass('');
+    setConfirmPass('');
+  };
+
+  return <>
+    <PageHeader eyebrow="TÀI KHOẢN CỦA TÔI" title="Hồ sơ cá nhân" desc="Quản lý thông tin tài khoản và lịch sử hồ sơ của bạn." />
+    <section className="container content-section">
+      <div className="profile-card">
+        <div className="profile-cover">
+          <span className="large-avatar">{initials(user.name)}</span>
+          <div>
+            <h2>{user.name}</h2>
+            <p>{roleLabel(user.role)} · {user.dept || 'Trường Đại học Thái Bình'}</p>
+          </div>
+          <button className="outline-btn" onClick={() => alert('Thông tin cá nhân được đồng bộ từ Cơ sở dữ liệu trường.')}>Đồng bộ dữ liệu</button>
+        </div>
+        
+        <div className="profile-tabs">
+          <button className={tab === 'info' ? 'selected' : ''} onClick={() => setTab('info')}>Thông tin cá nhân</button>
+          <button className={tab === 'password' ? 'selected' : ''} onClick={() => setTab('password')}>Đổi mật khẩu</button>
+          <button className={tab === 'history' ? 'selected' : ''} onClick={() => setTab('history')}>Lịch sử hồ sơ ({myApplications.length})</button>
+        </div>
+
+        {tab === 'info' && (
+          <div className="form-fields profile-fields">
+            <label>Họ và tên<input value={user.name} readOnly /></label>
+            <label>Mã định danh (SV / CBGV)<input value={user.code || '21D100123'} readOnly /></label>
+            <label>Email trường<input value={user.email} readOnly /></label>
+            <label>Số điện thoại<input value={user.phone || '0988 123 456'} readOnly /></label>
+            <label>Vai trò hệ thống<input value={roleLabel(user.role)} readOnly /></label>
+            <label>Trạng thái tài khoản<input value="Đang hoạt động (Active)" readOnly /></label>
+          </div>
+        )}
+
+        {tab === 'password' && (
+          <form onSubmit={handlePasswordChange} style={{maxWidth: 480, margin: '20px 0'}}>
+            {passMsg.text && (
+              <div className={`auth-alert ${passMsg.type}`} style={{marginBottom: 16}}>
+                {passMsg.type === 'success' ? <Check size={16}/> : <AlertCircle size={16}/>}
+                {passMsg.text}
+              </div>
+            )}
+            <div style={{display:'flex', flexDirection:'column', gap:12}}>
+              <label>Mật khẩu hiện tại
+                <input type="password" value={currentPass} onChange={e => setCurrentPass(e.target.value)} placeholder="Nhập mật khẩu cũ (mặc định 123456)" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #cbd5e1',marginTop:4}} />
+              </label>
+              <label>Mật khẩu mới
+                <input type="password" value={newPass} onChange={e => setNewPass(e.target.value)} placeholder="Tối thiểu 6 ký tự" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #cbd5e1',marginTop:4}} />
+              </label>
+              <label>Xác nhận mật khẩu mới
+                <input type="password" value={confirmPass} onChange={e => setConfirmPass(e.target.value)} placeholder="Nhập lại mật khẩu mới" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #cbd5e1',marginTop:4}} />
+              </label>
+              <button className="primary-btn" type="submit" style={{marginTop: 8}}>Cập nhật mật khẩu</button>
+            </div>
+          </form>
+        )}
+
+        {tab === 'history' && (
+          <div style={{marginTop: 20}}>
+            {myApplications.length > 0 ? (
+              <div className="admin-table-scroll">
+                <table className="procedures-table">
+                  <thead>
+                    <tr>
+                      <th>MÃ HỒ SƠ</th>
+                      <th>THỦ TỤC</th>
+                      <th>NGÀY NỘP</th>
+                      <th>TRẠNG THÁI</th>
+                      <th>HÀNH ĐỘNG</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {myApplications.map(app => (
+                      <tr key={app.code}>
+                        <td><b>{app.code}</b></td>
+                        <td>{app.procedure}</td>
+                        <td>{app.date}</td>
+                        <td><span className="status-badge"><i/> {app.status}</span></td>
+                        <td>
+                          <button className="table-action" onClick={() => navigate(`track?code=${app.code}`)}>Tra cứu tiến độ</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div style={{padding: 30, textAlign: 'center', color: '#718096'}}>
+                <p>Bạn chưa nộp hồ sơ nào trên hệ thống.</p>
+                <button className="primary-btn" onClick={() => navigate('apply')} style={{marginTop: 12}}>Nộp hồ sơ ngay</button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </section>
+  </>;
+}
 
 createRoot(document.getElementById('root')).render(<DataStoreProvider><App /></DataStoreProvider>);
