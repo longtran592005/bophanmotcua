@@ -1325,6 +1325,18 @@ function Apply({ navigate, currentUser }) {
   const [errorMsg, setErrorMsg] = useState('');
 
   const selected = allProcedures.find(item => item.id === selectedProcId) || allProcedures[0];
+  const SelectedIcon = selected?.icon || FileText;
+
+  if (!selected) {
+    return <>
+      <PageHeader eyebrow="DỊCH VỤ TRỰC TUYẾN" title="Nộp hồ sơ trực tuyến" desc="Hoàn tất hồ sơ của bạn chỉ với vài bước đơn giản." />
+      <section className="container content-section">
+        <div className="apply-card">
+          <p className="muted">Đang tải danh sách thủ tục. Vui lòng chờ trong giây lát...</p>
+        </div>
+      </section>
+    </>;
+  }
 
   const handleFileUpload = (e) => {
     const chosenFiles = Array.from(e.target.files || []);
@@ -1438,7 +1450,7 @@ function Apply({ navigate, currentUser }) {
             <input value={procSearch} onChange={e => setProcSearch(e.target.value)} placeholder="Tìm tên thủ tục..." />
           </div>
           <div className="selected-procedure" style={{marginBottom: 20}}>
-            <span className="quick-icon"><selected.icon size={20} /></span>
+            <span className="quick-icon"><SelectedIcon size={20} /></span>
             <div>
               <small>THỦ TỤC ĐƯỢC CHỌN</small>
               <b>{selected.title}</b>
